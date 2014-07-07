@@ -2,7 +2,7 @@
 
 namespace React\HttpClient;
 
-use Evenement\EventEmitter;
+use Evenement\EventEmitterTrait;
 use React\Stream\ReadableStreamInterface;
 use React\Stream\Stream;
 use React\Stream\Util;
@@ -13,8 +13,10 @@ use React\Stream\WritableStreamInterface;
  * @event error
  * @event end
  */
-class Response extends EventEmitter implements ReadableStreamInterface
+class Response implements ReadableStreamInterface
 {
+    use EventEmitterTrait;
+
     private $stream;
     private $protocol;
     private $version;
