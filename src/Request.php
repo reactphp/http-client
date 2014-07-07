@@ -4,16 +4,15 @@ namespace React\HttpClient;
 
 use Evenement\EventEmitter;
 use Guzzle\Parser\Message\MessageParser;
-use React\EventLoop\LoopInterface;
-use React\HttpClient\Response;
-use React\HttpClient\ResponseHeaderParser;
 use React\SocketClient\ConnectorInterface;
-use React\Stream\Stream;
 use React\Stream\WritableStreamInterface;
 
 /**
  * @event headers-written
  * @event response
+ * @event drain
+ * @event error
+ * @event end
  */
 class Request extends EventEmitter implements WritableStreamInterface
 {
@@ -244,4 +243,3 @@ class Request extends EventEmitter implements WritableStreamInterface
         return $factory;
     }
 }
-
