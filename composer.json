@@ -7,7 +7,10 @@
         "php": ">=5.4.0",
         "guzzle/parser": "~3.0",
         "react/socket-client": "0.4.*",
-        "react/dns": "0.4.*"
+        "react/dns": "0.4.*",
+        "react/event-loop": "0.4.*",
+        "react/stream": "0.4.*",
+        "evenement/evenement": "~2.0"
     },
     "autoload": {
         "psr-4": {

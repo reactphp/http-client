@@ -2,15 +2,21 @@
 
 namespace React\HttpClient;
 
-use Evenement\EventEmitter;
-use React\EventLoop\LoopInterface;
+use Evenement\EventEmitterTrait;
 use React\Stream\ReadableStreamInterface;
 use React\Stream\Stream;
 use React\Stream\Util;
 use React\Stream\WritableStreamInterface;
 
-class Response extends EventEmitter implements ReadableStreamInterface
+/**
+ * @event data
+ * @event error
+ * @event end
+ */
+class Response implements ReadableStreamInterface
 {
+    use EventEmitterTrait;
+
     private $stream;
     private $protocol;
     private $version;
@@ -116,11 +122,10 @@ class Response extends EventEmitter implements ReadableStreamInterface
         $this->stream->resume();
     }
 
-    public function pipe(WritableStreamInterface $dest, array $options = array())
+    public function pipe(WritableStreamInterface $dest, array $options = [])
     {
         Util::pipe($this, $dest, $options);
 
         return $dest;
     }
 }
-

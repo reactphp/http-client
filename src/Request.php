@@ -2,21 +2,22 @@
 
 namespace React\HttpClient;
 
-use Evenement\EventEmitter;
+use Evenement\EventEmitterTrait;
 use Guzzle\Parser\Message\MessageParser;
-use React\EventLoop\LoopInterface;
-use React\HttpClient\Response;
-use React\HttpClient\ResponseHeaderParser;
 use React\SocketClient\ConnectorInterface;
-use React\Stream\Stream;
 use React\Stream\WritableStreamInterface;
 
 /**
  * @event headers-written
  * @event response
+ * @event drain
+ * @event error
+ * @event end
  */
-class Request extends EventEmitter implements WritableStreamInterface
+class Request implements WritableStreamInterface
 {
+    use EventEmitterTrait;
+
     const STATE_INIT = 0;
     const STATE_WRITING_HEAD = 1;
     const STATE_HEAD_WRITTEN = 2;
@@ -244,4 +245,3 @@ class Request extends EventEmitter implements WritableStreamInterface
         return $factory;
     }
 }
-
