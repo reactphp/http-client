@@ -3,8 +3,8 @@
 namespace React\HttpClient;
 
 use Evenement\EventEmitterTrait;
+use React\Stream\DuplexStreamInterface;
 use React\Stream\ReadableStreamInterface;
-use React\Stream\Stream;
 use React\Stream\Util;
 use React\Stream\WritableStreamInterface;
 
@@ -25,7 +25,7 @@ class Response implements ReadableStreamInterface
     private $headers;
     private $readable = true;
 
-    public function __construct(Stream $stream, $protocol, $version, $code, $reasonPhrase, $headers)
+    public function __construct(DuplexStreamInterface $stream, $protocol, $version, $code, $reasonPhrase, $headers)
     {
         $this->stream = $stream;
         $this->protocol = $protocol;
