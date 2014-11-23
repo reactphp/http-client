@@ -48,6 +48,7 @@ $request->on('response', function ($response) {
     });
 });
 $request->end();
+$loop->run();
 ```
 
 ## TODO
