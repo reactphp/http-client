@@ -169,7 +169,7 @@ class Request implements WritableStreamInterface
 
     public function closeError(\Exception $error)
     {
-        if (self::STATE_END <= $this->state) {
+        if (self::STATE_END == $this->state) {
             return;
         }
         $this->emit('error', array($error, $this));
@@ -178,7 +178,7 @@ class Request implements WritableStreamInterface
 
     public function close(\Exception $error = null)
     {
-        if (self::STATE_END <= $this->state) {
+        if (self::STATE_END == $this->state) {
             return;
         }
 
