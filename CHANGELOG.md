@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.0 (2015-02-27)
+
+* New feature: follow redirect option
+* BC break: `Client` and `Request` take different constructor parameters.
+
 ## 0.4.0 (2014-02-02)
 
 * BC break: Drop unused `Response::getBody()`

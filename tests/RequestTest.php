@@ -2,8 +2,10 @@
 
 namespace React\Tests\HttpClient;
 
+use React\HttpClient\ConnectorPair;
 use React\HttpClient\Request;
 use React\HttpClient\RequestData;
+use React\HttpClient\RequestOptions;
 use React\Stream\Stream;
 use React\Promise\FulfilledPromise;
 use React\Promise\RejectedPromise;
@@ -30,7 +32,9 @@ class RequestTest extends TestCase
     public function requestShouldBindToStreamEventsAndUseconnector()
     {
         $requestData = new RequestData('GET', 'http://www.example.com');
-        $request = new Request($this->connector, $requestData);
+        $requestOptions = new RequestOptions();
+        $connectorPair = new ConnectorPair($this->connector, $this->connector);
+        $request = new Request($connectorPair, $requestData, $requestOptions);
 
         $this->successfulConnectionMock();
 
@@ -74,6 +78,10 @@ class RequestTest extends TestCase
             ->with('data', array('body'));
 
         $response->expects($this->at(0))
+            ->method('getCode')
+            ->will($this->returnValue(200));
+
+        $response->expects($this->at(1))
             ->method('on')
             ->with('end', $this->anything())
             ->will($this->returnCallback(function ($event, $cb) use (&$endCallback) {
@@ -120,7 +128,9 @@ class RequestTest extends TestCase
     public function requestShouldEmitErrorIfConnectionFails()
     {
         $requestData = new RequestData('GET', 'http://www.example.com');
-        $request = new Request($this->connector, $requestData);
+        $requestOptions = new RequestOptions();
+        $connectorPair = new ConnectorPair($this->connector, $this->connector);
+        $request = new Request($connectorPair, $requestData, $requestOptions);
 
         $this->rejectedConnectionMock();
 
@@ -153,7 +163,9 @@ class RequestTest extends TestCase
     public function requestShouldEmitErrorIfConnectionEndsBeforeResponseIsParsed()
     {
         $requestData = new RequestData('GET', 'http://www.example.com');
-        $request = new Request($this->connector, $requestData);
+        $requestOptions = new RequestOptions();
+        $connectorPair = new ConnectorPair($this->connector, $this->connector);
+        $request = new Request($connectorPair, $requestData, $requestOptions);
 
         $this->successfulConnectionMock();
 
@@ -187,7 +199,9 @@ class RequestTest extends TestCase
     public function requestShouldEmitErrorIfConnectionEmitsError()
     {
         $requestData = new RequestData('GET', 'http://www.example.com');
-        $request = new Request($this->connector, $requestData);
+        $requestOptions = new RequestOptions();
+        $connectorPair = new ConnectorPair($this->connector, $this->connector);
+        $request = new Request($connectorPair, $requestData, $requestOptions);
 
         $this->successfulConnectionMock();
 
@@ -221,7 +235,9 @@ class RequestTest extends TestCase
     public function postRequestShouldSendAPostRequest()
     {
         $requestData = new RequestData('POST', 'http://www.example.com');
-        $request = new Request($this->connector, $requestData);
+        $requestOptions = new RequestOptions();
+        $connectorPair = new ConnectorPair($this->connector, $this->connector);
+        $request = new Request($connectorPair, $requestData, $requestOptions);
 
         $this->successfulConnectionMock();
 
@@ -251,7 +267,9 @@ class RequestTest extends TestCase
     public function writeWithAPostRequestShouldSendToTheStream()
     {
         $requestData = new RequestData('POST', 'http://www.example.com');
-        $request = new Request($this->connector, $requestData);
+        $requestOptions = new RequestOptions();
+        $connectorPair = new ConnectorPair($this->connector, $this->connector);
+        $request = new Request($connectorPair, $requestData, $requestOptions);
 
         $this->successfulConnectionMock();
 
@@ -292,7 +310,9 @@ class RequestTest extends TestCase
     public function pipeShouldPipeDataIntoTheRequestBody()
     {
         $requestData = new RequestData('POST', 'http://www.example.com');
-        $request = new Request($this->connector, $requestData);
+        $requestOptions = new RequestOptions();
+        $connectorPair = new ConnectorPair($this->connector, $this->connector);
+        $request = new Request($connectorPair, $requestData, $requestOptions);
 
         $this->successfulConnectionMock();
 
@@ -343,7 +363,9 @@ class RequestTest extends TestCase
     public function endShouldOnlyAcceptScalars()
     {
         $requestData = new RequestData('POST', 'http://www.example.com');
-        $request = new Request($this->connector, $requestData);
+        $requestOptions = new RequestOptions();
+        $connectorPair = new ConnectorPair($this->connector, $this->connector);
+        $request = new Request($connectorPair, $requestData, $requestOptions);
 
         $request->end(array());
     }
@@ -352,16 +374,23 @@ class RequestTest extends TestCase
     public function requestShouldRelayErrorEventsFromResponse()
     {
         $requestData = new RequestData('GET', 'http://www.example.com');
-        $request = new Request($this->connector, $requestData);
+        $requestOptions = new RequestOptions();
+        $connectorPair = new ConnectorPair($this->connector, $this->connector);
+        $request = new Request($connectorPair, $requestData, $requestOptions);
 
         $this->successfulConnectionMock();
 
         $response = $this->response;
 
         $response->expects($this->at(0))
+            ->method('getCode')
+            ->will($this->returnValue(200));
+
+        $response->expects($this->at(1))
             ->method('on')
             ->with('end', $this->anything());
-        $response->expects($this->at(1))
+
+        $response->expects($this->at(2))
             ->method('on')
             ->with('error', $this->anything())
             ->will($this->returnCallback(function ($event, $cb) use (&$errorCallback) {
@@ -403,4 +432,3 @@ class RequestTest extends TestCase
             ->will($this->returnValue(new RejectedPromise(new \RuntimeException())));
     }
 }
-

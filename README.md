@@ -49,11 +49,17 @@ $request->on('response', function ($response) {
 });
 $request->end();
 $loop->run();
+
+?>
 ```
+
+## Work in progress
+
+* followRedirects option
+* maxRedirects option
 
 ## TODO
 
 * gzip content encoding
 * chunked transfer encoding
 * keep-alive connections
-* following redirections

@@ -2,29 +2,20 @@
 
 namespace React\HttpClient;
 
-use React\SocketClient\ConnectorInterface;
-
 class Client
 {
-    private $connector;
-    private $secureConnector;
+    private $connectorPair;
 
-    public function __construct(ConnectorInterface $connector, ConnectorInterface $secureConnector)
+    public function __construct(ConnectorPair $connectorPair)
     {
-        $this->connector = $connector;
-        $this->secureConnector = $secureConnector;
+        $this->connectorPair = $connectorPair;
     }
 
-    public function request($method, $url, array $headers = [])
+    public function request($method, $url, array $headers = [], array $options = null)
     {
         $requestData = new RequestData($method, $url, $headers);
-        $connector = $this->getConnectorForScheme($requestData->getScheme());
+        $requestOptions = new RequestOptions($options);
 
-        return new Request($connector, $requestData);
-    }
-
-    private function getConnectorForScheme($scheme)
-    {
-        return ('https' === $scheme) ? $this->secureConnector : $this->connector;
+        return new Request($this->connectorPair, $requestData, $requestOptions);
     }
 }

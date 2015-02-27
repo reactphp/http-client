@@ -32,6 +32,11 @@ class RequestData
         );
     }
 
+    public function getUrl()
+    {
+        return $this->url;
+    }
+
     public function getScheme()
     {
         return parse_url($this->url, PHP_URL_SCHEME);
@@ -77,5 +82,26 @@ class RequestData
         $data .= "\r\n";
 
         return $data;
+    }
+
+    /**
+     * Processes a redirect request, updating internal values to represent the new request data.
+     *
+     * @param integer $code     HTTP status code for the redirect.
+     * @param string  $location The Location header received.
+     */
+    public function redirect($code, $location)
+    {
+        switch ($code) {
+            case 301:
+            case 302:
+            case 307:
+            case 308:
+                $this->url = $location;
+                break;
+
+            default:
+                throw new InvalidArgumentException(sprintf("Redirect code %u is not supported", $code));
+        }
     }
 }

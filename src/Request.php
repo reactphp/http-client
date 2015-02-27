@@ -4,7 +4,6 @@ namespace React\HttpClient;
 
 use Evenement\EventEmitterTrait;
 use Guzzle\Parser\Message\MessageParser;
-use React\SocketClient\ConnectorInterface;
 use React\Stream\WritableStreamInterface;
 
 /**
@@ -24,7 +23,9 @@ class Request implements WritableStreamInterface
     const STATE_END = 3;
 
     private $connector;
+    private $connectorPair;
     private $requestData;
+    private $requestOptions;
 
     private $stream;
     private $buffer;
@@ -32,10 +33,17 @@ class Request implements WritableStreamInterface
     private $response;
     private $state = self::STATE_INIT;
 
-    public function __construct(ConnectorInterface $connector, RequestData $requestData)
+    private $redirectCount;
+    private $redirectLocations;
+
+    public function __construct(ConnectorPair $connectorPair, RequestData $requestData, RequestOptions $requestOptions)
     {
-        $this->connector = $connector;
+        $this->connectorPair = $connectorPair;
         $this->requestData = $requestData;
+        $this->requestOptions = $requestOptions;
+        $this->connector = $connectorPair->getConnectorForScheme($requestData->getScheme());
+        $this->redirectCount = 0;
+        $this->redirectLocations = [$requestData->getUrl()];
     }
 
     public function isWritable()
@@ -50,12 +58,11 @@ class Request implements WritableStreamInterface
         }
 
         $this->state = self::STATE_WRITING_HEAD;
-
         $requestData = $this->requestData;
         $streamRef = &$this->stream;
         $stateRef = &$this->state;
 
-        $this
+        return $this
             ->connect()
             ->then(
                 function ($stream) use ($requestData, &$streamRef, &$stateRef) {
@@ -89,12 +96,11 @@ class Request implements WritableStreamInterface
             return $this->stream->write($data);
         }
 
-        $this->on('headers-written', function ($this) use ($data) {
-            $this->write($data);
-        });
-
         if (self::STATE_WRITING_HEAD > $this->state) {
-            $this->writeHead();
+            $this->writeHead()
+                ->then(function () use ($data) {
+                    $this->stream->write($data);
+                });
         }
 
         return false;
@@ -108,7 +114,7 @@ class Request implements WritableStreamInterface
 
         if (null !== $data) {
             $this->write($data);
-        } else if (self::STATE_WRITING_HEAD > $this->state) {
+        } elseif (self::STATE_WRITING_HEAD > $this->state) {
             $this->writeHead();
         }
     }
@@ -131,6 +137,45 @@ class Request implements WritableStreamInterface
             $this->stream->removeListener('data', array($this, 'handleData'));
             $this->stream->removeListener('end', array($this, 'handleEnd'));
             $this->stream->removeListener('error', array($this, 'handleError'));
+
+            //Should we respond to any redirects?
+            if ($this->isRedirectCode($response->getCode())
+                && $this->requestOptions->shouldFollowRedirects()) {
+
+                //Have we reached our maximum redirects?
+                if ($this->requestOptions->getMaxRedirects() > 0
+                    && $this->redirectCount >= $this->requestOptions->getMaxRedirects()) {
+                    $this->closeError(new \RuntimeException(
+                        sprintf("Too many redirects: %u", $this->redirectCount)
+                    ));
+                }
+
+                //Is the location a cyclic redirect?
+                $headers = $response->getHeaders();
+                if (in_array($headers['Location'], $this->redirectLocations)) {
+                    $this->closeError(new \RuntimeException(
+                        "Cyclic redirect detected"
+                    ));
+                }
+
+                //Store the next location to prevent cyclic redirects.
+                $this->redirectLocations[] = $headers['Location'];
+                $this->redirectCount++;
+
+                //Recalibrate to this new location.
+                $this->requestData->redirect($response->getCode(), $headers['Location']);
+                $this->connector = $this->connectorPair->getConnectorForScheme($this->requestData->getScheme());
+
+                //Clean up and rewind.
+                $this->stream->close();
+                $this->responseFactory = null;
+                $this->state = self::STATE_INIT;
+
+                //Perform the same tricks.
+                $this->end();
+
+                return;
+            }
 
             $this->response = $response;
 
@@ -216,6 +261,12 @@ class Request implements WritableStreamInterface
 
         return $this->connector
             ->create($host, $port);
+    }
+
+    protected function isRedirectCode($code)
+    {
+        //Note: 303 status is currently unsupported.
+        return in_array($code, [301, 302, 307, 308]);
     }
 
     public function setResponseFactory($factory)
