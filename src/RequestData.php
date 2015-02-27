@@ -32,6 +32,11 @@ class RequestData
         );
     }
 
+    public function getMethod()
+    {
+        return strtoupper($this->method);
+    }
+
     public function getUrl()
     {
         return $this->url;
@@ -93,10 +98,19 @@ class RequestData
     public function redirect($code, $location)
     {
         switch ($code) {
+
+            //These cases require that we switch to the GET method.
+            //@see https://github.com/bagder/curl/blob/cc28bc472ec421cec2ba26d653e53892998a248d/lib/transfer.c#L1736
             case 301:
             case 302:
-            case 307:
-            case 308:
+                $this->method = 'GET';
+
+            //Note: 303, 307, 308 status is not supported in HTTP/1.0.
+            // case 303:
+            // case 307:
+            // case 308:
+
+                //Of course switch the location.
                 $this->url = $location;
                 break;
 

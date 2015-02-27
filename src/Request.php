@@ -265,8 +265,8 @@ class Request implements WritableStreamInterface
 
     protected function isRedirectCode($code)
     {
-        //Note: 303 status is currently unsupported.
-        return in_array($code, [301, 302, 307, 308]);
+        //Note: 303, 307, 308 status is not supported in HTTP/1.0.
+        return in_array($code, [301, 302]);
     }
 
     public function setResponseFactory($factory)
