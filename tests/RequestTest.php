@@ -372,7 +372,7 @@ class RequestTest extends TestCase
             ->will($this->returnValue($this->response));
 
         $this->response
-            ->expects($this->exactly(1))
+            ->expects($this->exactly(2))
             ->method('getCode')
             ->will($this->returnValue(302));
 
@@ -401,6 +401,84 @@ class RequestTest extends TestCase
 
         $request->handleData("HTTP/1.0 302 Found\r\n");
         $request->handleData("Location: http://www.example.com\r\n");
+        $request->handleData("Content-Type: text/plain\r\n");
+        $request->handleData("\r\nbody");
+    }
+
+    /** @test */
+    public function shouldAllowRedirectFromPostToGet()
+    {
+        $requestData = new RequestData('POST', 'http://www.example.com');
+        $requestOptions = new RequestOptions([
+            'followRedirects' => true,
+            'maxRedirects' => 1,
+        ]);
+        $connectorPair = new ConnectorPair($this->connector, $this->connector);
+        $request = new Request($connectorPair, $requestData, $requestOptions);
+
+        $this->connector
+            ->expects($this->at(0))
+            ->method('create')
+            ->with('www.example.com', 80)
+            ->will($this->returnValue(new FulfilledPromise($this->stream)));
+
+        $secondStream = $this->getMockBuilder('React\Stream\Stream')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $secondStream
+            ->expects($this->at(4))
+            ->method('write')
+            ->with($this->matchesRegularExpression("#^GET / HTTP/1\.0\r\nHost: www.example.com\r\nUser-Agent:.*\r\n\r\n$#"));
+        $secondStream
+            ->expects($this->at(5))
+            ->method('close');
+
+        $this->connector
+            ->expects($this->at(1))
+            ->method('create')
+            ->with('www.example.com', 80)
+            ->will($this->returnValue(new FulfilledPromise($secondStream)));
+
+        $this->stream
+            ->expects($this->at(4))
+            ->method('write')
+            ->with($this->matchesRegularExpression("#^POST / HTTP/1\.0\r\nHost: www.example.com\r\nUser-Agent:.*\r\n\r\n$#"));
+        $this->stream
+            ->expects($this->at(5))
+            ->method('write')
+            ->with($this->identicalTo("some post data"));
+        $this->stream
+            ->expects($this->at(6))
+            ->method('close');
+
+        $factory = $this->createCallableMock();
+        $factory->expects($this->exactly(1))
+            ->method('__invoke')
+            ->will($this->returnValue($this->response));
+
+        $this->response
+            ->expects($this->exactly(2))
+            ->method('getCode')
+            ->will($this->returnValue(302));
+
+        $this->response
+            ->expects($this->exactly(1))
+            ->method('getHeaders')
+            ->will($this->returnValue([
+                'Location' => 'http://www.example.com',
+                'Content-Type' => 'text/plain',
+            ]));
+
+        $request->setResponseFactory($factory);
+        $request->end('some post data');
+
+        $request->handleData("HTTP/1.0 302 Found\r\n");
+        $request->handleData("Location: http://www.example.com\r\n");
+        $request->handleData("Content-Type: text/plain\r\n");
+        $request->handleData("\r\nbody");
+
+        $request->handleData("HTTP/1.0 200 OK\r\n");
         $request->handleData("Content-Type: text/plain\r\n");
         $request->handleData("\r\nbody");
     }

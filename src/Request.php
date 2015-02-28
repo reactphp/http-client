@@ -43,7 +43,8 @@ class Request implements WritableStreamInterface
         $this->requestOptions = $requestOptions;
         $this->connector = $connectorPair->getConnectorForScheme($requestData->getScheme());
         $this->redirectCount = 0;
-        $this->redirectLocations = [$requestData->getUrl()];
+        $this->redirectLocations = [];
+        $this->trackLocation($requestData);
     }
 
     public function isWritable()
@@ -152,9 +153,13 @@ class Request implements WritableStreamInterface
                     return;
                 }
 
-                //Is the location a cyclic redirect?
+                //Recalibrate to this new location.
                 $headers = $response->getHeaders();
-                if (in_array($headers['Location'], $this->redirectLocations)) {
+                $this->requestData->redirect($response->getCode(), $headers['Location']);
+                $this->connector = $this->connectorPair->getConnectorForScheme($this->requestData->getScheme());
+
+                //Is the location a cyclic redirect?
+                if ($this->isKnownLocation($this->requestData->getMethod(), $headers['Location'])) {
                     $this->closeError(new \RuntimeException(
                         "Cyclic redirect detected"
                     ));
@@ -163,12 +168,8 @@ class Request implements WritableStreamInterface
                 }
 
                 //Store the next location to prevent cyclic redirects.
-                $this->redirectLocations[] = $headers['Location'];
+                $this->trackLocation($this->requestData);
                 $this->redirectCount++;
-
-                //Recalibrate to this new location.
-                $this->requestData->redirect($response->getCode(), $headers['Location']);
-                $this->connector = $this->connectorPair->getConnectorForScheme($this->requestData->getScheme());
 
                 //Clean up and rewind.
                 $this->stream->close();
@@ -271,6 +272,16 @@ class Request implements WritableStreamInterface
     {
         //Note: 303, 307, 308 status is not supported in HTTP/1.0.
         return in_array($code, [301, 302]);
+    }
+
+    protected function trackLocation(RequestData $requestData)
+    {
+        $this->redirectLocations[] = $requestData->getMethod().' '.$requestData->getUrl();
+    }
+
+    protected function isKnownLocation($method, $url)
+    {
+        return in_array($method.' '.$url, $this->redirectLocations);
     }
 
     public function setResponseFactory($factory)
