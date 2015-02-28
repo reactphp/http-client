@@ -73,5 +73,44 @@ class ResponseTest extends TestCase
         $response->resume();
         $response->pause();
     }
-}
 
+    /** @test */
+    public function responseShouldOfferHeaders()
+    {
+        $headers = array('content-type' => 'text/plain');
+        $response = new Response($this->stream, 'http', '1.0', '200', 'ok', $headers);
+        $this->assertSame($headers, $response->getHeaders());
+    }
+
+    /** @test */
+    public function responseShouldOfferProtocol()
+    {
+        $protocol = 'http';
+        $response = new Response($this->stream, $protocol, '1.0', '200', 'ok', array('content-type' => 'text/plain'));
+        $this->assertSame($protocol, $response->getProtocol());
+    }
+
+    /** @test */
+    public function responseShouldOfferVersion()
+    {
+        $version = '1.0';
+        $response = new Response($this->stream, 'http', $version, '200', 'ok', array('content-type' => 'text/plain'));
+        $this->assertSame($version, $response->getVersion());
+    }
+
+    /** @test */
+    public function responseShouldOfferReasonPhrase()
+    {
+        $reasonphrase = 'OK';
+        $response = new Response($this->stream, 'http', '1.0', '200', $reasonphrase, array('content-type' => 'text/plain'));
+        $this->assertSame($reasonphrase, $response->getReasonPhrase());
+    }
+
+    /** @test */
+    public function responseShouldOfferCode()
+    {
+        $code = 'OK';
+        $response = new Response($this->stream, 'http', '1.0', $code, 'ok', array('content-type' => 'text/plain'));
+        $this->assertSame($code, $response->getCode());
+    }
+}
