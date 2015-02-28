@@ -2,6 +2,8 @@
 
 namespace React\HttpClient;
 
+use InvalidArgumentException;
+
 class RequestData
 {
     private $method;

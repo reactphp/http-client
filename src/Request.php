@@ -143,11 +143,13 @@ class Request implements WritableStreamInterface
                 && $this->requestOptions->shouldFollowRedirects()) {
 
                 //Have we reached our maximum redirects?
-                if ($this->requestOptions->getMaxRedirects() > 0
+                if ($this->requestOptions->getMaxRedirects() >= 0
                     && $this->redirectCount >= $this->requestOptions->getMaxRedirects()) {
                     $this->closeError(new \RuntimeException(
                         sprintf("Too many redirects: %u", $this->redirectCount)
                     ));
+
+                    return;
                 }
 
                 //Is the location a cyclic redirect?
@@ -156,6 +158,8 @@ class Request implements WritableStreamInterface
                     $this->closeError(new \RuntimeException(
                         "Cyclic redirect detected"
                     ));
+
+                    return;
                 }
 
                 //Store the next location to prevent cyclic redirects.
