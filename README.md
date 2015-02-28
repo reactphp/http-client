@@ -41,7 +41,10 @@ $dnsResolver = $dnsResolverFactory->createCached('8.8.8.8', $loop);
 $factory = new React\HttpClient\Factory();
 $client = $factory->create($loop, $dnsResolver);
 
-$request = $client->request('GET', 'https://github.com/');
+$request = $client->request('GET', 'https://github.com/', [], [
+    'followRedirects' => true,
+    'maxRedirects' => 5
+]);
 $request->on('response', function ($response) {
     $response->on('data', function ($data) {
         // ...
@@ -52,11 +55,6 @@ $loop->run();
 
 ?>
 ```
-
-## Work in progress
-
-* followRedirects option
-* maxRedirects option
 
 ## TODO
 

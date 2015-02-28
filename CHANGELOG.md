@@ -1,8 +1,9 @@
 # Changelog
 
-## 0.5.0 (2015-02-27)
+## Development (not released yet)
 
-* New feature: follow redirect option
+* New feature: followRedirects option
+* New feature: maxRedirects option
 * BC break: `Client` and `Request` take different constructor parameters.
 
 ## 0.4.0 (2014-02-02)
