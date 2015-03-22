@@ -134,8 +134,8 @@ class Request implements WritableStreamInterface
 
             $this->response = $response;
 
-            $response->on('end', function () {
-                $this->close();
+            $response->on('end', function (\Exception $error = null) {
+                $this->close($error);
             });
             $response->on('error', function (\Exception $error) {
                 $this->closeError(new \RuntimeException(
