@@ -33,7 +33,7 @@ class ResponseParser
                 $headers[$name] = [];
             }
 
-            $headers[$name] += $value;
+            $headers[$name] = array_merge($headers[$name], $value);
         }
 
         return [
