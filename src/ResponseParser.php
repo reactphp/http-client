@@ -20,7 +20,14 @@ class ResponseParser
         $headers = [];
         foreach ($lines as $line) {
             list($header, $value) = array_map('trim', explode(':', $line, 2));
-            $headers[$header] = $value;
+
+            if (!isset($headers[$header])) {
+                $headers[$header] = $value;
+            } elseif (!is_array($headers[$header])) {
+                $headers[$header] = [ $headers[$header], $value ];
+            } else {
+                $headers[$header][] = $value;
+            }
         }
 
         return [
