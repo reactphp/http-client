@@ -19,15 +19,19 @@ class ResponseParser
 
         $headers = [];
         foreach ($lines as $line) {
-            list($header, $value) = array_map('trim', explode(':', $line, 2));
+            list($name, $value) = array_map('trim', explode(':', $line, 2));
 
-            if (!isset($headers[$header])) {
-                $headers[$header] = $value;
-            } elseif (!is_array($headers[$header])) {
-                $headers[$header] = [ $headers[$header], $value ];
-            } else {
-                $headers[$header][] = $value;
+            $name = strtolower($name);
+
+            if (false !== strpos($value, ',')) {
+                $value = array_map('trim', explode(',', $value));
             }
+
+            if (!isset($headers[$name])) {
+                $value = [ $value ];
+            }
+
+            $headers[$name] = $value;
         }
 
         return [
