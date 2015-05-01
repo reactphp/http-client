@@ -25,13 +25,15 @@ class ResponseParser
 
             if (false !== strpos($value, ',')) {
                 $value = array_map('trim', explode(',', $value));
-            }
-
-            if (!isset($headers[$name])) {
+            } else {
                 $value = [ $value ];
             }
 
-            $headers[$name] = $value;
+            if (!isset($headers[$name])) {
+                $headers[$name] = [];
+            }
+
+            $headers[$name] += $value;
         }
 
         return [
