@@ -23,6 +23,12 @@ class ResponseParser
 
             $name = strtolower($name);
 
+            if (false !== strpos($value, ';')) {
+                $value = array_map('trim', explode(';', $value));
+            } else {
+                $value = [ $value ];
+            }
+
             if (!isset($headers[$name])) {
                 $headers[$name] = [];
             }
