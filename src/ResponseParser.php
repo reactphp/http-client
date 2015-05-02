@@ -4,7 +4,7 @@ namespace React\HttpClient;
 
 class ResponseParser
 {
-    public function parseResponse($raw)
+    public function parse($raw)
     {
         if (false === strpos($raw, "\r\n\r\n")) {
             throw new \InvalidArgumentException("Parameter is not a valid http response");

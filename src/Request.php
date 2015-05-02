@@ -193,7 +193,7 @@ class Request implements WritableStreamInterface
     protected function parseResponse($data)
     {
         $parser = new ResponseParser();
-        $parsed = $parser->parseResponse($data);
+        $parsed = $parser->parse($data);
 
         $factory = $this->getResponseFactory();
 
