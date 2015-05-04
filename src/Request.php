@@ -201,11 +201,11 @@ class Request implements WritableStreamInterface
             $parsed['protocol'],
             $parsed['version'],
             $parsed['code'],
-            $parsed['reason_phrase'],
+            $parsed['reason'],
             $parsed['headers']
         );
 
-        return array($response, $parsed['body']);
+        return [ $response, $parsed['body']];
     }
 
     protected function connect()
