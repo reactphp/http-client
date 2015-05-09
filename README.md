@@ -17,16 +17,17 @@ Interesting events emitted by Request:
 
 * `response`: The response headers were received from the server and successfully
   parsed. The first argument is a Response instance.
-* `error`: An error occured.
-* `end`: The request is finished. If an error occured, it is passed as first
+* `error`: An error occurred.
+* `end`: The request is finished. If an error occurred, it is passed as first
   argument. Second and third arguments are the Response and the Request.
 
 Interesting events emitted by Response:
 
-* `data`: Passes a chunk of the response body as first argument
-* `error`: An error occured.
+* `data`: Passes a chunk of the response body as first argument and a Response
+  object itself as second argument.
+* `error`: An error occurred.
 * `end`: The response has been fully received. If an error
-  occured, it is passed as first argument
+  occurred, it is passed as first argument.
 
 ### Example
 
@@ -43,7 +44,7 @@ $client = $factory->create($loop, $dnsResolver);
 
 $request = $client->request('GET', 'https://github.com/');
 $request->on('response', function ($response) {
-    $response->on('data', function ($data) {
+    $response->on('data', function ($data, $response) {
         // ...
     });
 });
