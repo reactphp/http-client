@@ -42,10 +42,13 @@ $factory = new React\HttpClient\Factory();
 $client = $factory->create($loop, $dnsResolver);
 
 $request = $client->request('GET', 'https://github.com/');
-$request->on('response', function ($response) {
-    $response->on('data', function ($data) {
+$request->on('end', function ($error, $response) {
+    if ($error) {
         // ...
-    });
+    } else {
+        $data = $response->getContent();
+        // ...
+    }
 });
 $request->end();
 $loop->run();

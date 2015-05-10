@@ -23,6 +23,7 @@ class Response implements ReadableStreamInterface
     private $code;
     private $reasonPhrase;
     private $headers;
+    private $content = '';
     private $readable = true;
 
     public function __construct(DuplexStreamInterface $stream, $protocol, $version, $code, $reasonPhrase, $headers)
@@ -64,8 +65,14 @@ class Response implements ReadableStreamInterface
         return $this->headers;
     }
 
+    public function getContent()
+    {
+        return $this->content;
+    }
+
     public function handleData($data)
     {
+        $this->content .= $data;
         $this->emit('data', array($data, $this));
     }
 
