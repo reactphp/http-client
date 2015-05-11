@@ -42,6 +42,17 @@ $factory = new React\HttpClient\Factory();
 $client = $factory->create($loop, $dnsResolver);
 
 $request = $client->request('GET', 'https://github.com/');
+
+// Either process the data in chunks as it arrives...
+$request->on('response', function ($response) {
+    $response->on('data', function ($data) {
+        // ...
+    });
+});
+// ...or store the entire response body, and process it on completion.
+$request->on('response', function ($response) {
+    $response->enableContentStore(true);
+});
 $request->on('end', function ($error, $response) {
     if ($error) {
         // ...
@@ -50,6 +61,7 @@ $request->on('end', function ($error, $response) {
         // ...
     }
 });
+
 $request->end();
 $loop->run();
 ```

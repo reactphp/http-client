@@ -23,8 +23,9 @@ class Response implements ReadableStreamInterface
     private $code;
     private $reasonPhrase;
     private $headers;
-    private $content = '';
+    private $content;
     private $readable = true;
+    private $saveContent = false;
 
     public function __construct(DuplexStreamInterface $stream, $protocol, $version, $code, $reasonPhrase, $headers)
     {
@@ -70,9 +71,17 @@ class Response implements ReadableStreamInterface
         return $this->content;
     }
 
+    public function enableContentStore($enabled)
+    {
+        $this->saveContent = (bool) $enabled;
+    }
+
     public function handleData($data)
     {
-        $this->content .= $data;
+        if ($this->saveContent) {
+            $this->content .= $data;
+        }
+
         $this->emit('data', array($data, $this));
     }
 
