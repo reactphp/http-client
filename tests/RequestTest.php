@@ -70,8 +70,8 @@ class RequestTest extends TestCase
         $response = $this->response;
 
         $response->expects($this->once())
-            ->method('emit')
-            ->with('data', array('body'));
+            ->method('handleData')
+            ->with('body');
 
         $response->expects($this->at(0))
             ->method('on')

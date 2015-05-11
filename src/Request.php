@@ -147,7 +147,7 @@ class Request implements WritableStreamInterface
 
             $this->emit('response', array($response, $this));
 
-            $response->emit('data', array($bodyChunk));
+            $response->handleData($bodyChunk);
         }
     }
 
