@@ -27,7 +27,11 @@ class ResponseParser
 
         list($protocol, $version) = explode('/', $http, 2);
 
-        if ($protocol !== 'HTTP') {
+        if (empty($protocol) or $protocol !== 'HTTP') {
+            return false;
+        }
+
+        if (empty($version) or !is_numeric($version)) {
             return false;
         }
 
