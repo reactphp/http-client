@@ -60,7 +60,6 @@ class ResponseParserTest extends TestCase
             [ "HTTP 404 Not Found\r\n\r\n", false, 'missing version 2' ],
             [ "HTTP/1.0 Not Found\r\n\r\n", false, 'missing code' ],
             [ "FTP/1.0 404 Not Found\r\n\r\n", false, 'invalid protocol' ],
-            [ "HTTP/1.1 404 Not Found\r\n\r\n", false, 'invalid version' ],
             [ "HTTP/1.0 42 Answer to the Ultimate Question\r\n\r\n", false, 'invalid code' ],
             [ "HTTP/1.0 200 OK\r\nContent-Length 4\r\n\r\nTest", [
                 'protocol' => 'HTTP',
