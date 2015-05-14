@@ -12,7 +12,7 @@ class ResponseParser
 
         list($head, $body) = explode("\r\n\r\n", $raw, 2);
 
-        $lines = explode("\r\n", $head);
+        $lines = array_map('trim', explode("\n", $head));
         $first_line = array_shift($lines);
 
         if (!strpos($first_line, ' ')) {
