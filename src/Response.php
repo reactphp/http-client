@@ -9,7 +9,7 @@ use React\Stream\Util;
 use React\Stream\WritableStreamInterface;
 
 /**
- * @event data
+ * @event data ($bodyChunk, Response $thisResponse)
  * @event error
  * @event end
  */
