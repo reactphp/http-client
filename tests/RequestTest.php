@@ -2,8 +2,10 @@
 
 namespace React\Tests\HttpClient;
 
+use React\HttpClient\ConnectorPair;
 use React\HttpClient\Request;
 use React\HttpClient\RequestData;
+use React\HttpClient\RequestOptions;
 use React\Stream\Stream;
 use React\Promise\FulfilledPromise;
 use React\Promise\RejectedPromise;
@@ -30,7 +32,9 @@ class RequestTest extends TestCase
     public function requestShouldBindToStreamEventsAndUseconnector()
     {
         $requestData = new RequestData('GET', 'http://www.example.com');
-        $request = new Request($this->connector, $requestData);
+        $requestOptions = new RequestOptions();
+        $connectorPair = new ConnectorPair($this->connector, $this->connector);
+        $request = new Request($connectorPair, $requestData, $requestOptions);
 
         $this->successfulConnectionMock();
 
@@ -74,6 +78,10 @@ class RequestTest extends TestCase
             ->with('data', array('body', $response));
 
         $response->expects($this->at(0))
+            ->method('getCode')
+            ->will($this->returnValue(200));
+
+        $response->expects($this->at(1))
             ->method('on')
             ->with('end', $this->anything())
             ->will($this->returnCallback(function ($event, $cb) use (&$endCallback) {
@@ -120,7 +128,9 @@ class RequestTest extends TestCase
     public function requestShouldEmitErrorIfConnectionFails()
     {
         $requestData = new RequestData('GET', 'http://www.example.com');
-        $request = new Request($this->connector, $requestData);
+        $requestOptions = new RequestOptions();
+        $connectorPair = new ConnectorPair($this->connector, $this->connector);
+        $request = new Request($connectorPair, $requestData, $requestOptions);
 
         $this->rejectedConnectionMock();
 
@@ -153,7 +163,9 @@ class RequestTest extends TestCase
     public function requestShouldEmitErrorIfConnectionEndsBeforeResponseIsParsed()
     {
         $requestData = new RequestData('GET', 'http://www.example.com');
-        $request = new Request($this->connector, $requestData);
+        $requestOptions = new RequestOptions();
+        $connectorPair = new ConnectorPair($this->connector, $this->connector);
+        $request = new Request($connectorPair, $requestData, $requestOptions);
 
         $this->successfulConnectionMock();
 
@@ -187,7 +199,9 @@ class RequestTest extends TestCase
     public function requestShouldEmitErrorIfConnectionEmitsError()
     {
         $requestData = new RequestData('GET', 'http://www.example.com');
-        $request = new Request($this->connector, $requestData);
+        $requestOptions = new RequestOptions();
+        $connectorPair = new ConnectorPair($this->connector, $this->connector);
+        $request = new Request($connectorPair, $requestData, $requestOptions);
 
         $this->successfulConnectionMock();
 
@@ -221,7 +235,9 @@ class RequestTest extends TestCase
     public function postRequestShouldSendAPostRequest()
     {
         $requestData = new RequestData('POST', 'http://www.example.com');
-        $request = new Request($this->connector, $requestData);
+        $requestOptions = new RequestOptions();
+        $connectorPair = new ConnectorPair($this->connector, $this->connector);
+        $request = new Request($connectorPair, $requestData, $requestOptions);
 
         $this->successfulConnectionMock();
 
@@ -248,10 +264,288 @@ class RequestTest extends TestCase
     }
 
     /** @test */
+    public function redirectingPostRequestShouldSwitchToGet()
+    {
+        $requestData = new RequestData('POST', 'http://www.example.com');
+        $requestOptions = new RequestOptions([
+            'followRedirects' => true,
+            'maxRedirects' => 1,
+        ]);
+        $connectorPair = new ConnectorPair($this->connector, $this->connector);
+        $request = new Request($connectorPair, $requestData, $requestOptions);
+
+        $this->connector
+            ->expects($this->at(0))
+            ->method('create')
+            ->with('www.example.com', 80)
+            ->will($this->returnValue(new FulfilledPromise($this->stream)));
+
+        $secondStream = $this->getMockBuilder('React\Stream\Stream')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $secondStream
+            ->expects($this->at(4))
+            ->method('write')
+            ->with($this->matchesRegularExpression("#^GET / HTTP/1\.0\r\nHost: www.foo.bar\r\nUser-Agent:.*\r\n\r\n$#"));
+        $secondStream
+            ->expects($this->at(5))
+            ->method('close');
+
+        $this->connector
+            ->expects($this->at(1))
+            ->method('create')
+            ->with('www.foo.bar', 80)
+            ->will($this->returnValue(new FulfilledPromise($secondStream)));
+
+        $this->stream
+            ->expects($this->at(4))
+            ->method('write')
+            ->with($this->matchesRegularExpression("#^POST / HTTP/1\.0\r\nHost: www.example.com\r\nUser-Agent:.*\r\n\r\n$#"));
+        $this->stream
+            ->expects($this->at(5))
+            ->method('write')
+            ->with($this->identicalTo("some post data"));
+        $this->stream
+            ->expects($this->at(6))
+            ->method('close');
+
+        $factory = $this->createCallableMock();
+        $factory->expects($this->at(0))
+            ->method('__invoke')
+            ->will($this->returnValue($this->response));
+
+        $this->response
+            ->expects($this->exactly(2))
+            ->method('getCode')
+            ->will($this->returnValue(302));
+
+        $this->response
+            ->expects($this->exactly(1))
+            ->method('getHeaders')
+            ->will($this->returnValue([
+                'Location' => 'http://www.foo.bar',
+                'Content-Type' => 'text/plain',
+            ]));
+
+        $request->setResponseFactory($factory);
+        $request->end('some post data');
+
+        $request->handleData("HTTP/1.0 302 Found\r\n");
+        $request->handleData("Location: http://www.foo.bar\r\n");
+        $request->handleData("Content-Type: text/plain\r\n");
+        $request->handleData("\r\nbody");
+
+        $request->handleData("HTTP/1.0 200 OK\r\n");
+        $request->handleData("Content-Type: text/plain\r\n");
+        $request->handleData("\r\nbody");
+    }
+
+    /** @test */
+    public function shouldDetectCyclicRedirect()
+    {
+        $requestData = new RequestData('GET', 'http://www.example.com');
+        $requestOptions = new RequestOptions([
+            'followRedirects' => true,
+            'maxRedirects' => 5,
+        ]);
+        $connectorPair = new ConnectorPair($this->connector, $this->connector);
+        $request = new Request($connectorPair, $requestData, $requestOptions);
+
+        $this->connector
+            ->expects($this->at(0))
+            ->method('create')
+            ->with('www.example.com', 80)
+            ->will($this->returnValue(new FulfilledPromise($this->stream)));
+
+        $this->stream
+            ->expects($this->at(4))
+            ->method('write')
+            ->with($this->matchesRegularExpression("#^GET / HTTP/1\.0\r\nHost: www.example.com\r\nUser-Agent:.*\r\n\r\n$#"));
+        $this->stream
+            ->expects($this->at(5))
+            ->method('close');
+
+        $factory = $this->createCallableMock();
+        $factory->expects($this->at(0))
+            ->method('__invoke')
+            ->will($this->returnValue($this->response));
+
+        $this->response
+            ->expects($this->exactly(2))
+            ->method('getCode')
+            ->will($this->returnValue(302));
+
+        $this->response
+            ->expects($this->exactly(1))
+            ->method('getHeaders')
+            ->will($this->returnValue([
+                'Location' => 'http://www.example.com',
+                'Content-Type' => 'text/plain',
+            ]));
+
+        $handler = $this->createCallableMock();
+        $handler->expects($this->once())
+            ->method('__invoke')
+            ->with(
+                $this->isInstanceOf('RuntimeException'),
+                null,
+                $this->isInstanceOf('React\HttpClient\Request')
+            );
+
+        $request->on('end', $handler);
+        $request->on('close', $this->expectCallableNever());
+
+        $request->setResponseFactory($factory);
+        $request->end();
+
+        $request->handleData("HTTP/1.0 302 Found\r\n");
+        $request->handleData("Location: http://www.example.com\r\n");
+        $request->handleData("Content-Type: text/plain\r\n");
+        $request->handleData("\r\nbody");
+    }
+
+    /** @test */
+    public function shouldAllowRedirectFromPostToGet()
+    {
+        $requestData = new RequestData('POST', 'http://www.example.com');
+        $requestOptions = new RequestOptions([
+            'followRedirects' => true,
+            'maxRedirects' => 1,
+        ]);
+        $connectorPair = new ConnectorPair($this->connector, $this->connector);
+        $request = new Request($connectorPair, $requestData, $requestOptions);
+
+        $this->connector
+            ->expects($this->at(0))
+            ->method('create')
+            ->with('www.example.com', 80)
+            ->will($this->returnValue(new FulfilledPromise($this->stream)));
+
+        $secondStream = $this->getMockBuilder('React\Stream\Stream')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $secondStream
+            ->expects($this->at(4))
+            ->method('write')
+            ->with($this->matchesRegularExpression("#^GET / HTTP/1\.0\r\nHost: www.example.com\r\nUser-Agent:.*\r\n\r\n$#"));
+        $secondStream
+            ->expects($this->at(5))
+            ->method('close');
+
+        $this->connector
+            ->expects($this->at(1))
+            ->method('create')
+            ->with('www.example.com', 80)
+            ->will($this->returnValue(new FulfilledPromise($secondStream)));
+
+        $this->stream
+            ->expects($this->at(4))
+            ->method('write')
+            ->with($this->matchesRegularExpression("#^POST / HTTP/1\.0\r\nHost: www.example.com\r\nUser-Agent:.*\r\n\r\n$#"));
+        $this->stream
+            ->expects($this->at(5))
+            ->method('write')
+            ->with($this->identicalTo("some post data"));
+        $this->stream
+            ->expects($this->at(6))
+            ->method('close');
+
+        $factory = $this->createCallableMock();
+        $factory->expects($this->exactly(1))
+            ->method('__invoke')
+            ->will($this->returnValue($this->response));
+
+        $this->response
+            ->expects($this->exactly(2))
+            ->method('getCode')
+            ->will($this->returnValue(302));
+
+        $this->response
+            ->expects($this->exactly(1))
+            ->method('getHeaders')
+            ->will($this->returnValue([
+                'Location' => 'http://www.example.com',
+                'Content-Type' => 'text/plain',
+            ]));
+
+        $request->setResponseFactory($factory);
+        $request->end('some post data');
+
+        $request->handleData("HTTP/1.0 302 Found\r\n");
+        $request->handleData("Location: http://www.example.com\r\n");
+        $request->handleData("Content-Type: text/plain\r\n");
+        $request->handleData("\r\nbody");
+
+        $request->handleData("HTTP/1.0 200 OK\r\n");
+        $request->handleData("Content-Type: text/plain\r\n");
+        $request->handleData("\r\nbody");
+    }
+
+    /** @test */
+    public function shouldDetectTooManyRedirects()
+    {
+        $requestData = new RequestData('GET', 'http://www.example.com');
+        $requestOptions = new RequestOptions([
+            'followRedirects' => true,
+            'maxRedirects' => 0,
+        ]);
+        $connectorPair = new ConnectorPair($this->connector, $this->connector);
+        $request = new Request($connectorPair, $requestData, $requestOptions);
+
+        $this->connector
+            ->expects($this->at(0))
+            ->method('create')
+            ->with('www.example.com', 80)
+            ->will($this->returnValue(new FulfilledPromise($this->stream)));
+
+        $this->stream
+            ->expects($this->at(4))
+            ->method('write')
+            ->with($this->matchesRegularExpression("#^GET / HTTP/1\.0\r\nHost: www.example.com\r\nUser-Agent:.*\r\n\r\n$#"));
+        $this->stream
+            ->expects($this->at(5))
+            ->method('close');
+
+        $factory = $this->createCallableMock();
+        $factory->expects($this->at(0))
+            ->method('__invoke')
+            ->will($this->returnValue($this->response));
+
+        $this->response
+            ->expects($this->exactly(1))
+            ->method('getCode')
+            ->will($this->returnValue(302));
+
+        $handler = $this->createCallableMock();
+        $handler->expects($this->once())
+            ->method('__invoke')
+            ->with(
+                $this->isInstanceOf('RuntimeException'),
+                null,
+                $this->isInstanceOf('React\HttpClient\Request')
+            );
+
+        $request->on('end', $handler);
+        $request->on('close', $this->expectCallableNever());
+
+        $request->setResponseFactory($factory);
+        $request->end();
+
+        $request->handleData("HTTP/1.0 302 Found\r\n");
+        $request->handleData("Location: http://www.foo.bar\r\n");
+        $request->handleData("Content-Type: text/plain\r\n");
+        $request->handleData("\r\nbody");
+    }
+
+    /** @test */
     public function writeWithAPostRequestShouldSendToTheStream()
     {
         $requestData = new RequestData('POST', 'http://www.example.com');
-        $request = new Request($this->connector, $requestData);
+        $requestOptions = new RequestOptions();
+        $connectorPair = new ConnectorPair($this->connector, $this->connector);
+        $request = new Request($connectorPair, $requestData, $requestOptions);
 
         $this->successfulConnectionMock();
 
@@ -292,7 +586,9 @@ class RequestTest extends TestCase
     public function pipeShouldPipeDataIntoTheRequestBody()
     {
         $requestData = new RequestData('POST', 'http://www.example.com');
-        $request = new Request($this->connector, $requestData);
+        $requestOptions = new RequestOptions();
+        $connectorPair = new ConnectorPair($this->connector, $this->connector);
+        $request = new Request($connectorPair, $requestData, $requestOptions);
 
         $this->successfulConnectionMock();
 
@@ -343,7 +639,9 @@ class RequestTest extends TestCase
     public function endShouldOnlyAcceptScalars()
     {
         $requestData = new RequestData('POST', 'http://www.example.com');
-        $request = new Request($this->connector, $requestData);
+        $requestOptions = new RequestOptions();
+        $connectorPair = new ConnectorPair($this->connector, $this->connector);
+        $request = new Request($connectorPair, $requestData, $requestOptions);
 
         $request->end(array());
     }
@@ -352,16 +650,23 @@ class RequestTest extends TestCase
     public function requestShouldRelayErrorEventsFromResponse()
     {
         $requestData = new RequestData('GET', 'http://www.example.com');
-        $request = new Request($this->connector, $requestData);
+        $requestOptions = new RequestOptions();
+        $connectorPair = new ConnectorPair($this->connector, $this->connector);
+        $request = new Request($connectorPair, $requestData, $requestOptions);
 
         $this->successfulConnectionMock();
 
         $response = $this->response;
 
         $response->expects($this->at(0))
+            ->method('getCode')
+            ->will($this->returnValue(200));
+
+        $response->expects($this->at(1))
             ->method('on')
             ->with('end', $this->anything());
-        $response->expects($this->at(1))
+
+        $response->expects($this->at(2))
             ->method('on')
             ->with('error', $this->anything())
             ->will($this->returnCallback(function ($event, $cb) use (&$errorCallback) {
@@ -403,4 +708,3 @@ class RequestTest extends TestCase
             ->will($this->returnValue(new RejectedPromise(new \RuntimeException())));
     }
 }
-

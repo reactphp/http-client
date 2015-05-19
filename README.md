@@ -42,7 +42,10 @@ $dnsResolver = $dnsResolverFactory->createCached('8.8.8.8', $loop);
 $factory = new React\HttpClient\Factory();
 $client = $factory->create($loop, $dnsResolver);
 
-$request = $client->request('GET', 'https://github.com/');
+$request = $client->request('GET', 'https://github.com/', [], [
+    'followRedirects' => true,
+    'maxRedirects' => 5
+]);
 $request->on('response', function ($response) {
     $response->on('data', function ($data, $response) {
         // ...
@@ -50,6 +53,8 @@ $request->on('response', function ($response) {
 });
 $request->end();
 $loop->run();
+
+?>
 ```
 
 ## TODO
@@ -57,4 +62,3 @@ $loop->run();
 * gzip content encoding
 * chunked transfer encoding
 * keep-alive connections
-* following redirections

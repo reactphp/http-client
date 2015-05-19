@@ -1,5 +1,11 @@
 # Changelog
 
+## Development (not released yet)
+
+* New feature: followRedirects option
+* New feature: maxRedirects option
+* BC break: `Client` and `Request` take different constructor parameters.
+
 ## 0.4.0 (2014-02-02)
 
 * BC break: Drop unused `Response::getBody()`
