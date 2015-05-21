@@ -211,11 +211,12 @@ class Request implements WritableStreamInterface
 
     protected function connect()
     {
-        $host = $this->requestData->getHost();
-        $port = $this->requestData->getPort();
-
         return $this->connector
-            ->create($host, $port);
+            ->create(sprintf(
+                '%s:%s',
+                $this->requestData->getHost(),
+                $this->requestData->getPort()
+            ));
     }
 
     public function setResponseFactory($factory)
