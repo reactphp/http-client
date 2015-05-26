@@ -15,12 +15,12 @@ class Client
         $this->secureConnector = $secureConnector;
     }
 
-    public function request($method, $url, array $headers = [], $protocolVersion = '1.0')
+    public function request($method, $url, array $headers = [], $protocolVersion = '1.0', ProxyConfig $proxyConfig = null)
     {
         $requestData = new RequestData($method, $url, $headers, $protocolVersion);
         $connector = $this->getConnectorForScheme($requestData->getScheme());
 
-        return new Request($connector, $requestData);
+        return new Request($connector, $requestData, $proxyConfig);
     }
 
     private function getConnectorForScheme($scheme)
