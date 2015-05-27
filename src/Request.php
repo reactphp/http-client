@@ -57,7 +57,7 @@ class Request implements WritableStreamInterface
 
         $this
             ->connect()
-            ->then(
+            ->done(
                 function ($stream) use ($requestData, &$streamRef, &$stateRef) {
                     $streamRef = $stream;
 

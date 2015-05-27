@@ -217,6 +217,25 @@ class RequestTest extends TestCase
         $request->handleError(new \Exception('test'));
     }
 
+    /**
+     * @test
+     * @expectedException Exception
+     * @expectedExceptionMessage something failed
+     */
+    public function requestDoesNotHideErrors()
+    {
+        $requestData = new RequestData('GET', 'http://www.example.com');
+        $request = new Request($this->connector, $requestData);
+
+        $this->rejectedConnectionMock();
+
+        $request->on('error', function () {
+            throw new \Exception('something failed');
+        });
+
+        $request->end();
+    }
+
     /** @test */
     public function postRequestShouldSendAPostRequest()
     {
