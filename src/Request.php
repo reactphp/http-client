@@ -32,6 +32,8 @@ class Request implements WritableStreamInterface
     private $response;
     private $state = self::STATE_INIT;
 
+    private $pendingWrites = array();
+
     public function __construct(ConnectorInterface $connector, RequestData $requestData)
     {
         $this->connector = $connector;
@@ -89,9 +91,17 @@ class Request implements WritableStreamInterface
             return $this->stream->write($data);
         }
 
-        $this->on('headers-written', function ($this) use ($data) {
-            $this->write($data);
-        });
+        if (!count($this->pendingWrites)) {
+            $this->on('headers-written', function ($this) {
+                foreach ($this->pendingWrites as $pw) {
+                    $this->write($pw);
+                }
+                $this->pendingWrites = array();
+                $this->emit('drain', array($this));
+            });
+        }
+
+        $this->pendingWrites[] = $data;
 
         if (self::STATE_WRITING_HEAD > $this->state) {
             $this->writeHead();
