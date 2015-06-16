@@ -7,6 +7,8 @@ use React\HttpClient\RequestData;
 use React\Stream\Stream;
 use React\Promise\FulfilledPromise;
 use React\Promise\RejectedPromise;
+use React\Promise;
+use React\Promise\Deferred;
 
 class RequestTest extends TestCase
 {
@@ -289,6 +291,53 @@ class RequestTest extends TestCase
     }
 
     /** @test */
+    public function writeWithAPostRequestShouldSendBodyAfterHeadersAndEmitDrainEvent()
+    {
+        $requestData = new RequestData('POST', 'http://www.example.com');
+        $request = new Request($this->connector, $requestData);
+
+        $resolveConnection = $this->successfulAsyncConnectionMock();
+
+        $this->stream
+            ->expects($this->at(4))
+            ->method('write')
+            ->with($this->matchesRegularExpression("#^POST / HTTP/1\.0\r\nHost: www.example.com\r\nUser-Agent:.*\r\n\r\n$#"));
+        $this->stream
+            ->expects($this->at(5))
+            ->method('write')
+            ->with($this->identicalTo("some"));
+        $this->stream
+            ->expects($this->at(6))
+            ->method('write')
+            ->with($this->identicalTo("post"));
+        $this->stream
+            ->expects($this->at(7))
+            ->method('write')
+            ->with($this->identicalTo("data"));
+
+        $factory = $this->createCallableMock();
+        $factory->expects($this->once())
+            ->method('__invoke')
+            ->will($this->returnValue($this->response));
+
+        $request->setResponseFactory($factory);
+
+        $this->assertFalse($request->write("some"));
+        $this->assertFalse($request->write("post"));
+
+        $request->once('drain', function () use ($request) {
+            $request->write("data");
+            $request->end();
+        });
+
+        $resolveConnection();
+
+        $request->handleData("HTTP/1.0 200 OK\r\n");
+        $request->handleData("Content-Type: text/plain\r\n");
+        $request->handleData("\r\nbody");
+    }
+
+    /** @test */
     public function pipeShouldPipeDataIntoTheRequestBody()
     {
         $requestData = new RequestData('POST', 'http://www.example.com');
@@ -387,11 +436,22 @@ class RequestTest extends TestCase
 
     private function successfulConnectionMock()
     {
+        call_user_func($this->successfulAsyncConnectionMock());
+    }
+
+    private function successfulAsyncConnectionMock()
+    {
+        $deferred = new Deferred();
+
         $this->connector
             ->expects($this->once())
             ->method('create')
             ->with('www.example.com', 80)
-            ->will($this->returnValue(new FulfilledPromise($this->stream)));
+            ->will($this->returnValue($deferred->promise()));
+
+        return function () use ($deferred) {
+            $deferred->resolve($this->stream);
+        };
     }
 
     private function rejectedConnectionMock()
