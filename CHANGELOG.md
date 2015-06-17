@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.4.4 (2015-06-16)
+
+* Improvement: Emit drain event when the request is ready to receive more data by @arnaud-lb
+
+## 0.4.3 (2015-06-15)
+
+* Improvement: Added support for using auth informations from URL by @arnaud-lb
+
+## 0.4.2 (2015-05-14)
+
+* Improvement: Pass Response object on with data emit by @dpovshed
+
+## 0.4.1 (2014-11-23)
+
+* Improvement: Use EventEmitterTrait instead of base class by @cursedcoder
+* Improvement: Changed Stream to DuplexStreamInterface in Response::__construct by @mbonneau
+
 ## 0.4.0 (2014-02-02)
 
 * BC break: Drop unused `Response::getBody()`
