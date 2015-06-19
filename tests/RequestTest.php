@@ -85,7 +85,7 @@ class RequestTest extends TestCase
         $factory = $this->createCallableMock();
         $factory->expects($this->once())
             ->method('__invoke')
-            ->with('HTTP', '1.0', '200', 'OK', array('Content-Type' => 'text/plain'))
+            ->with('HTTP', '1.0', '200', 'OK', [ 'content-type' => [[ 'text/plain' ]] ])
             ->will($this->returnValue($response));
 
         $request->setResponseFactory($factory);
@@ -420,7 +420,7 @@ class RequestTest extends TestCase
         $factory = $this->createCallableMock();
         $factory->expects($this->once())
             ->method('__invoke')
-            ->with('HTTP', '1.0', '200', 'OK', array('Content-Type' => 'text/plain'))
+            ->with('HTTP', '1.0', '200', 'OK', [ 'content-type' => [[ 'text/plain' ]]])
             ->will($this->returnValue($response));
 
         $request->setResponseFactory($factory);
