@@ -462,5 +462,43 @@ class RequestTest extends TestCase
             ->with('www.example.com', 80)
             ->will($this->returnValue(new RejectedPromise(new \RuntimeException())));
     }
-}
 
+    /** @test */
+    public function multivalueHeader()
+    {
+        $requestData = new RequestData('GET', 'http://www.example.com');
+        $request = new Request($this->connector, $requestData);
+
+        $this->successfulConnectionMock();
+
+        $response = $this->response;
+
+        $response->expects($this->at(0))
+        ->method('on')
+        ->with('end', $this->anything());
+        $response->expects($this->at(1))
+        ->method('on')
+        ->with('error', $this->anything())
+        ->will($this->returnCallback(function ($event, $cb) use (&$errorCallback) {
+            $errorCallback = $cb;
+        }));
+
+        $factory = $this->createCallableMock();
+        $factory->expects($this->once())
+        ->method('__invoke')
+        ->with('HTTP', '1.0', '200', 'OK', array('Content-Type' => 'text/plain', 'X-Xss-Protection' => '1; mode=block', 'Cache-Control' => 'public, must-revalidate, max-age=0'))
+        ->will($this->returnValue($response));
+
+        $request->setResponseFactory($factory);
+        $request->end();
+
+        $request->handleData("HTTP/1.0 200 OK\r\n");
+        $request->handleData("Content-Type: text/plain\r\n");
+        $request->handleData("X-Xss-Protection:1; mode=block\r\n");
+        $request->handleData("Cache-Control:public, must-revalidate, max-age=0\r\n");
+        $request->handleData("\r\nbody");
+
+        $this->assertNotNull($errorCallback);
+        call_user_func($errorCallback, new \Exception('test'));
+    }
+}
