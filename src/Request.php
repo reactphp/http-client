@@ -204,7 +204,7 @@ class Request implements WritableStreamInterface
     protected function parseResponse($data)
     {
         $psrResponse = gPsr\parse_response($data);
-        $headers = array_map(function(&$val) {
+        $headers = array_map(function($val) {
             if (1 === count($val)) {
                 $val = $val[0];
             }
