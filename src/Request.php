@@ -3,7 +3,7 @@
 namespace React\HttpClient;
 
 use Evenement\EventEmitterTrait;
-use GuzzleHttp\Psr7 as g7;
+use GuzzleHttp\Psr7 as gPsr;
 use React\SocketClient\ConnectorInterface;
 use React\Stream\WritableStreamInterface;
 
@@ -203,7 +203,7 @@ class Request implements WritableStreamInterface
 
     protected function parseResponse($data)
     {
-        $psrResponse = g7\parse_response($data);
+        $psrResponse = gPsr\parse_response($data);
         $headers = $psrResponse->getHeaders();
         array_walk($headers, function(&$val) {
             if (1 === count($val)) {
