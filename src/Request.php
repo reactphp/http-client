@@ -3,7 +3,7 @@
 namespace React\HttpClient;
 
 use Evenement\EventEmitterTrait;
-use Guzzle\Parser\Message\MessageParser;
+use GuzzleHttp\Psr7 as gPsr;
 use React\SocketClient\ConnectorInterface;
 use React\Stream\WritableStreamInterface;
 
@@ -203,20 +203,26 @@ class Request implements WritableStreamInterface
 
     protected function parseResponse($data)
     {
-        $parser = new MessageParser();
-        $parsed = $parser->parseResponse($data);
+        $psrResponse = gPsr\parse_response($data);
+        $headers = array_map(function($val) {
+            if (1 === count($val)) {
+                $val = $val[0];
+            }
+
+            return $val;
+        }, $psrResponse->getHeaders());
 
         $factory = $this->getResponseFactory();
 
         $response = $factory(
-            $parsed['protocol'],
-            $parsed['version'],
-            $parsed['code'],
-            $parsed['reason_phrase'],
-            $parsed['headers']
+            'HTTP',
+            $psrResponse->getProtocolVersion(),
+            $psrResponse->getStatusCode(),
+            $psrResponse->getReasonPhrase(),
+            $headers
         );
 
-        return array($response, $parsed['body']);
+        return array($response, $psrResponse->getBody());
     }
 
     protected function connect()

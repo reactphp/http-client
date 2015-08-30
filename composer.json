@@ -5,7 +5,7 @@
     "license": "MIT",
     "require": {
         "php": ">=5.4.0",
-        "guzzle/parser": "~3.0",
+        "guzzlehttp/psr7": "^1.0",
         "react/socket-client": "0.4.*",
         "react/dns": "0.4.*",
         "react/event-loop": "0.4.*",
