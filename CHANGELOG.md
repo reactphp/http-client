@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.5 (2015-08-31)
+
+* Improvement: Replaced the abandoned guzzle/parser with guzzlehttp/psr7 @WyriHaximus
+
 ## 0.4.4 (2015-06-16)
 
 * Improvement: Emit drain event when the request is ready to receive more data by @arnaud-lb
