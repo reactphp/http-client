@@ -68,7 +68,6 @@ class Request implements WritableStreamInterface
                     $stream->on('end', array($this, 'handleEnd'));
                     $stream->on('error', array($this, 'handleError'));
 
-                    $requestData->setProtocolVersion('1.0');
                     $headers = (string) $requestData;
 
                     $stream->write($headers);

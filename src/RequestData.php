@@ -8,7 +8,7 @@ class RequestData
     private $url;
     private $headers;
 
-    private $protocolVersion = '1.1';
+    private $protocolVersion = '1.0';
 
     public function __construct($method, $url, array $headers = [])
     {
