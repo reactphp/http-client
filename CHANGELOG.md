@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.6 (2015-09-20)
+
+* Improvement: Support explicitly using HTTP/1.1 protocol version @clue
+
 ## 0.4.5 (2015-08-31)
 
 * Improvement: Replaced the abandoned guzzle/parser with guzzlehttp/psr7 @WyriHaximus
