@@ -15,9 +15,9 @@ class Client
         $this->secureConnector = $secureConnector;
     }
 
-    public function request($method, $url, array $headers = [])
+    public function request($method, $url, array $headers = [], $protocolVersion = '1.0')
     {
-        $requestData = new RequestData($method, $url, $headers);
+        $requestData = new RequestData($method, $url, $headers, $protocolVersion);
         $connector = $this->getConnectorForScheme($requestData->getScheme());
 
         return new Request($connector, $requestData);
