@@ -7,14 +7,14 @@ class RequestData
     private $method;
     private $url;
     private $headers;
+    private $protocolVersion;
 
-    private $protocolVersion = '1.0';
-
-    public function __construct($method, $url, array $headers = [])
+    public function __construct($method, $url, array $headers = [], $protocolVersion = '1.0')
     {
         $this->method = $method;
         $this->url = $url;
         $this->headers = $headers;
+        $this->protocolVersion = $protocolVersion;
     }
 
     private function mergeDefaultheaders(array $headers)

@@ -35,6 +35,20 @@ class RequestDataTest extends TestCase
     }
 
     /** @test */
+    public function toStringReturnsHTTPRequestMessageWithProtocolVersionThroughConstructor()
+    {
+        $requestData = new RequestData('GET', 'http://www.example.com', [], '1.1');
+
+        $expected = "GET / HTTP/1.1\r\n" .
+            "Host: www.example.com\r\n" .
+            "User-Agent: React/alpha\r\n" .
+            "Connection: close\r\n" .
+            "\r\n";
+
+        $this->assertSame($expected, $requestData->__toString());
+    }
+
+    /** @test */
     public function toStringUsesUserPassFromURL()
     {
         $requestData = new RequestData('GET', 'http://john:dummy@www.example.com');
