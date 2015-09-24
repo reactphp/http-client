@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.7 (2015-09-24)
+
+* Improvement: Set protocol version on request creation @WyriHaximus
+
 ## 0.4.6 (2015-09-20)
 
 * Improvement: Support explicitly using HTTP/1.1 protocol version @clue
