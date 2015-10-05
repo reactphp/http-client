@@ -10,6 +10,7 @@
         "react/dns": "0.4.*",
         "react/event-loop": "0.4.*",
         "react/stream": "0.4.*",
+        "react/promise": "~2.2",
         "evenement/evenement": "~2.0"
     },
     "autoload": {
