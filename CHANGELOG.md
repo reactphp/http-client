@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.8 (2015-10-05)
+
+* Improvement: Avoid hidding exceptions thrown in HttpClient\Request error handlers @arnaud-lb
+
 ## 0.4.7 (2015-09-24)
 
 * Improvement: Set protocol version on request creation @WyriHaximus
