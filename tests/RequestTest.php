@@ -2,6 +2,7 @@
 
 namespace React\Tests\HttpClient;
 
+use React\HttpClient\ProxyConfig;
 use React\HttpClient\Request;
 use React\HttpClient\RequestData;
 use React\Stream\Stream;
@@ -451,6 +452,37 @@ class RequestTest extends TestCase
 
         $this->assertNotNull($errorCallback);
         call_user_func($errorCallback, new \Exception('test'));
+    }
+
+    /** @test */
+    public function requestShouldConnectToProxyAndUseAnAbsoluteURIWhenUsingAProxy()
+    {
+        $requestData = new RequestData('GET', 'http://www.example.com');
+        $proxyConfig = new ProxyConfig('127.0.0.1', 3128);
+        $request = new Request($this->connector, $requestData, $proxyConfig);
+
+        $this->connector
+            ->expects($this->once())
+            ->method('create')
+            ->with('127.0.0.1', 3128)
+            ->will($this->returnValue(new FulfilledPromise($this->stream)));
+
+        $this->stream
+            ->expects($this->at(4))
+            ->method('write')
+            ->with($this->matchesRegularExpression("#^GET http://www.example.com HTTP/1\.0\r\nHost: www.example.com\r\nUser-Agent:.*\r\n\r\n$#"));
+
+        $factory = $this->createCallableMock();
+        $factory->expects($this->once())
+            ->method('__invoke')
+            ->will($this->returnValue($this->response));
+
+        $request->setResponseFactory($factory);
+        $request->end(null);
+
+        $request->handleData("HTTP/1.0 200 OK\r\n");
+        $request->handleData("Content-Type: text/plain\r\n");
+        $request->handleData("\r\nbody");
     }
 
     private function successfulConnectionMock()
