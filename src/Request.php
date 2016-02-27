@@ -198,6 +198,7 @@ class Request implements WritableStreamInterface
         }
 
         $this->emit('end', array($error, $this->response, $this));
+        $this->removeAllListeners();
     }
 
     protected function parseResponse($data)
