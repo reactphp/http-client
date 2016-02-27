@@ -453,6 +453,19 @@ class RequestTest extends TestCase
         call_user_func($errorCallback, new \Exception('test'));
     }
 
+    /** @test */
+    public function requestShouldRemoveAllListenerAfterClosed()
+    {
+        $requestData = new RequestData('GET', 'http://www.example.com');
+        $request = new Request($this->connector, $requestData);
+
+        $request->on('end', function () {});
+        $this->assertCount(1, $request->listeners('end'));
+
+        $request->close();
+        $this->assertCount(0, $request->listeners('end'));
+    }
+
     private function successfulConnectionMock()
     {
         call_user_func($this->successfulAsyncConnectionMock());
