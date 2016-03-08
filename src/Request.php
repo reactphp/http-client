@@ -91,12 +91,12 @@ class Request implements WritableStreamInterface
         }
 
         if (!count($this->pendingWrites)) {
-            $this->on('headers-written', function ($this) {
-                foreach ($this->pendingWrites as $pw) {
-                    $this->write($pw);
+            $this->on('headers-written', function ($that) {
+                foreach ($that->pendingWrites as $pw) {
+                    $that->write($pw);
                 }
-                $this->pendingWrites = array();
-                $this->emit('drain', array($this));
+                $that->pendingWrites = array();
+                $that->emit('drain', array($that));
             });
         }
 
