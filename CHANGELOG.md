@@ -3,6 +3,7 @@
 ## 0.4.9 (2016-03-08)
 
 * Improvement: PHP 7 memory leak, related to PHP bug [71737](https://bugs.php.net/bug.php?id=71737) @jmalloc
+* Improvement: Clean up all listeners when closing request @weichenlin
 
 ## 0.4.8 (2015-10-05)
 
