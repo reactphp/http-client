@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.10 (2016-03-21)
+
+* Improvement: Update react/socket-client dependency to all supported versions @clue
+
 ## 0.4.9 (2016-03-08)
 
 * Improvement: PHP 7 memory leak, related to PHP bug [71737](https://bugs.php.net/bug.php?id=71737) @jmalloc
