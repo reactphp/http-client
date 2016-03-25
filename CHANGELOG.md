@@ -51,6 +51,11 @@
 * Dependency: Autoloading and filesystem structure now PSR-4 instead of PSR-0
 * Bump React dependencies to v0.4
 
+## 0.3.2 (2016-03-25)
+
+* Improvement: Broader guzzle/parser version req @cboden 
+* Improvement: Improve forwards compatibility with all supported versions @clue 
+
 ## 0.3.1 (2013-04-21)
 
 * Bug fix: Correct requirement for socket-client
