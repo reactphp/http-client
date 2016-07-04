@@ -30,11 +30,6 @@ class DecodeChunkedStreamTest extends TestCase
         $response = new ChunkedStreamDecoder($stream);
         $buffer = '';
         $response->on('data', function ($data) use (&$buffer) {
-
-            echo PHP_EOL, '------------------' , PHP_EOL;
-            echo 'CHUNK: ', $data;
-            echo PHP_EOL, '------------------' , PHP_EOL;
-
             $buffer .= $data;
             $this->assertTrue(true);
         });
