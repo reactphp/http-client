@@ -31,7 +31,6 @@ class DecodeChunkedStreamTest extends TestCase
         $buffer = '';
         $response->on('data', function ($data) use (&$buffer) {
             $buffer .= $data;
-            $this->assertTrue(true);
         });
         foreach ($strings as $string) {
             $stream->write($string);
