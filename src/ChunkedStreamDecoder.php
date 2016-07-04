@@ -6,7 +6,7 @@ use Evenement\EventEmitterTrait;
 use React\Stream\DuplexStreamInterface;
 use React\Stream\Util;
 
-class DecodeChunkedStream
+class ChunkedStreamDecoder
 {
     const CRLF = "\r\n";
 

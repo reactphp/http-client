@@ -2,7 +2,7 @@
 
 namespace React\Tests\HttpClient;
 
-use React\HttpClient\DecodeChunkedStream;
+use React\HttpClient\ChunkedStreamDecoder;
 use React\Stream\ThroughStream;
 
 class DecodeChunkedStreamTest extends TestCase
@@ -27,7 +27,7 @@ class DecodeChunkedStreamTest extends TestCase
     public function testChunkedEncoding(array $strings)
     {
         $stream = new ThroughStream();
-        $response = new DecodeChunkedStream($stream);
+        $response = new ChunkedStreamDecoder($stream);
         $buffer = '';
         $response->on('data', function ($data) use (&$buffer) {
 
