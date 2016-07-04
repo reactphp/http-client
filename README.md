@@ -55,6 +55,5 @@ $loop->run();
 ## TODO
 
 * gzip content encoding
-* chunked transfer encoding
 * keep-alive connections
 * following redirections
