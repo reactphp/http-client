@@ -34,9 +34,13 @@ class Response implements ReadableStreamInterface
         $this->reasonPhrase = $reasonPhrase;
         $this->headers = $headers;
 
-        $stream->on('data', array($this, 'handleData'));
-        $stream->on('error', array($this, 'handleError'));
-        $stream->on('end', array($this, 'handleEnd'));
+        if (isset($this->headers['transfer-encoding']) && $this->headers['transfer-encoding'] == 'chunked') {
+            $this->stream = new ChunkedStreamDecoder($stream);
+        }
+
+        $this->stream->on('data', array($this, 'handleData'));
+        $this->stream->on('error', array($this, 'handleError'));
+        $this->stream->on('end', array($this, 'handleEnd'));
     }
 
     public function getProtocol()
