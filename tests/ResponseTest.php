@@ -3,6 +3,7 @@
 namespace React\Tests\HttpClient;
 
 use React\HttpClient\Response;
+use React\Stream\ThroughStream;
 
 class ResponseTest extends TestCase
 {
@@ -72,6 +73,33 @@ class ResponseTest extends TestCase
 
         $response->resume();
         $response->pause();
+    }
+
+    /** @test */
+    public function chunkedEncodingResponse()
+    {
+        $stream = new ThroughStream();
+        $response = new Response(
+            $stream,
+            'http',
+            '1.0',
+            '200',
+            'ok',
+            [
+                'content-type' => 'text/plain',
+                'transfer-encoding' => 'chunked',
+            ]
+        );
+
+        $buffer = '';
+        $response->on('data', function ($data) use (&$buffer) {
+            $buffer.= $data;
+        });
+        $this->assertSame('', $buffer);
+        $stream->write("4\r\n");
+        $this->assertSame('', $buffer);
+        $stream->write("Wiki\r\n");
+        $this->assertSame('Wiki', $buffer);
     }
 }
 
