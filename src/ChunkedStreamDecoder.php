@@ -75,6 +75,9 @@ class ChunkedStreamDecoder
 
         if ($this->remainingLength > 0) {
             $chunkLength = $this->getChunkLength();
+            if ($chunkLength === 0) {
+                return;
+            }
             $this->emit('data', array(
                 substr($this->buffer, 0, $chunkLength),
                 $this,
