@@ -18,6 +18,11 @@ class ChunkedStreamDecoder
     protected $buffer = '';
 
     /**
+     * @var string
+     */
+    protected $chunkedExtension = '';
+
+    /**
      * @var int
      */
     protected $remainingLength = 0;
@@ -58,7 +63,13 @@ class ChunkedStreamDecoder
     {
         if ($this->nextChunkIsLength) {
             $this->nextChunkIsLength = false;
-            $this->remainingLength = hexdec(substr($this->buffer, 0, strpos($this->buffer, static::CRLF)));
+            $this->chunkedExtension = '';
+            $lengthChunk = substr($this->buffer, 0, strpos($this->buffer, static::CRLF));
+            if (strpos($lengthChunk, ';') !== false) {
+                list($lengthChunk, $chunkedExtension) = explode(';', $lengthChunk, 2);
+                $this->chunkedExtension = trim($chunkedExtension);
+            }
+            $this->remainingLength = hexdec($lengthChunk);
             $this->buffer = substr($this->buffer, strpos($this->buffer, static::CRLF) + 2);
         }
 
@@ -66,7 +77,8 @@ class ChunkedStreamDecoder
             $chunkLength = $this->getChunkLength();
             $this->emit('data', array(
                 substr($this->buffer, 0, $chunkLength),
-                $this
+                $this,
+                $this->chunkedExtension
             ));
             $this->remainingLength -= $chunkLength;
             $this->buffer = substr($this->buffer, $chunkLength);
