@@ -92,14 +92,19 @@ class ResponseTest extends TestCase
         );
 
         $buffer = '';
-        $response->on('data', function ($data) use (&$buffer) {
+        $exts = [];
+        $response->on('data', function ($data, $stream, $ext) use (&$buffer, &$exts) {
             $buffer.= $data;
+            $exts[] = $ext;
         });
         $this->assertSame('', $buffer);
-        $stream->write("4\r\n");
+        $this->assertSame([], $exts);
+        $stream->write("4; abc=def\r\n");
         $this->assertSame('', $buffer);
+        $this->assertSame([], $exts);
         $stream->write("Wiki\r\n");
         $this->assertSame('Wiki', $buffer);
+        $this->assertSame(['abc=def'], $exts);
     }
 }
 

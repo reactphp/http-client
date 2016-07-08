@@ -69,9 +69,9 @@ class Response implements ReadableStreamInterface
         return $this->headers;
     }
 
-    public function handleData($data)
+    public function handleData($data, $stream = null, $extra = '')
     {
-        $this->emit('data', array($data, $this));
+        $this->emit('data', array($data, $this, $extra));
     }
 
     public function handleEnd()
