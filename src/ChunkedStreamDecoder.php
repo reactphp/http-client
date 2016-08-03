@@ -64,13 +64,14 @@ class ChunkedStreamDecoder
         if ($this->nextChunkIsLength) {
             $this->nextChunkIsLength = false;
             $this->chunkExtension = '';
-            $lengthChunk = substr($this->buffer, 0, strpos($this->buffer, static::CRLF));
+            $crlfPosition = strpos($this->buffer, static::CRLF);
+            $lengthChunk = substr($this->buffer, 0, $crlfPosition);
             if (strpos($lengthChunk, ';') !== false) {
                 list($lengthChunk, $chunkExtension) = explode(';', $lengthChunk, 2);
                 $this->chunkExtension = trim($chunkExtension);
             }
             $this->remainingLength = hexdec($lengthChunk);
-            $this->buffer = substr($this->buffer, strpos($this->buffer, static::CRLF) + 2);
+            $this->buffer = substr($this->buffer, $crlfPosition + 2);
         }
 
         if ($this->remainingLength > 0) {
