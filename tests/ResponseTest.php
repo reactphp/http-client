@@ -92,19 +92,14 @@ class ResponseTest extends TestCase
         );
 
         $buffer = '';
-        $exts = [];
-        $response->on('data', function ($data, $stream, $ext) use (&$buffer, &$exts) {
+        $response->on('data', function ($data, $stream) use (&$buffer) {
             $buffer.= $data;
-            $exts[] = $ext;
         });
         $this->assertSame('', $buffer);
-        $this->assertSame([], $exts);
         $stream->write("4; abc=def\r\n");
         $this->assertSame('', $buffer);
-        $this->assertSame([], $exts);
         $stream->write("Wiki\r\n");
         $this->assertSame('Wiki', $buffer);
-        $this->assertSame([['chunkExtension' => 'abc=def']], $exts);
     }
 }
 
