@@ -81,7 +81,9 @@ class ChunkedStreamDecoder
             $this->emit('data', array(
                 substr($this->buffer, 0, $chunkLength),
                 $this,
-                $this->chunkedExtension
+                [
+                    'chunkedExtension' => $this->chunkedExtension,
+                ]
             ));
             $this->remainingLength -= $chunkLength;
             $this->buffer = substr($this->buffer, $chunkLength);

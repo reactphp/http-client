@@ -104,7 +104,7 @@ class ResponseTest extends TestCase
         $this->assertSame([], $exts);
         $stream->write("Wiki\r\n");
         $this->assertSame('Wiki', $buffer);
-        $this->assertSame(['abc=def'], $exts);
+        $this->assertSame([['chunkedExtension' => 'abc=def']], $exts);
     }
 }
 
