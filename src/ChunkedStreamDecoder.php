@@ -46,7 +46,6 @@ class ChunkedStreamDecoder
         $this->stream->on('data', array($this, 'handleData'));
         Util::forwardEvents($this->stream, $this, [
             'error',
-            'end',
         ]);
     }
 
