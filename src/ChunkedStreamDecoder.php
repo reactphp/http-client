@@ -3,7 +3,7 @@
 namespace React\HttpClient;
 
 use Evenement\EventEmitterTrait;
-use React\Stream\DuplexStreamInterface;
+use React\Stream\ReadableStreamInterface;
 use React\Stream\Util;
 
 class ChunkedStreamDecoder
@@ -33,14 +33,14 @@ class ChunkedStreamDecoder
     protected $nextChunkIsLength = true;
 
     /**
-     * @var DuplexStreamInterface
+     * @var ReadableStreamInterface
      */
     protected $stream;
 
     /**
-     * @param DuplexStreamInterface $stream
+     * @param ReadableStreamInterface $stream
      */
-    public function __construct(DuplexStreamInterface $stream)
+    public function __construct(ReadableStreamInterface $stream)
     {
         $this->stream = $stream;
         $this->stream->on('data', array($this, 'handleData'));
