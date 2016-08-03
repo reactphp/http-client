@@ -13,62 +13,62 @@ class DecodeChunkedStreamTest extends TestCase
             [
                 ["4\r\nWiki\r\n5\r\npedia\r\ne\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"],
                 [
-                    ['chunkedExtension' => ''],
-                    ['chunkedExtension' => ''],
-                    ['chunkedExtension' => ''],
+                    ['chunkExtension' => ''],
+                    ['chunkExtension' => ''],
+                    ['chunkExtension' => ''],
                 ],
             ],
             [
                 ["4\r\nWiki\r\n", "5\r\npedia\r\ne\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"],
                 [
-                    ['chunkedExtension' => ''],
-                    ['chunkedExtension' => ''],
-                    ['chunkedExtension' => ''],
+                    ['chunkExtension' => ''],
+                    ['chunkExtension' => ''],
+                    ['chunkExtension' => ''],
                 ],
             ],
             [
                 ["4\r\nWiki\r\n", "5\r\n", "pedia\r\ne\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"],
                 [
 
-                    ['chunkedExtension' => ''],
-                    ['chunkedExtension' => ''],
-                    ['chunkedExtension' => ''],
+                    ['chunkExtension' => ''],
+                    ['chunkExtension' => ''],
+                    ['chunkExtension' => ''],
                 ],
             ],
             [
                 ["4\r\nWiki\r\n", "5\r\n", "pedia\r\ne\r\n in\r\n", "\r\nchunks.\r\n0\r\n\r\n"],
                 [
-                    ['chunkedExtension' => ''],
-                    ['chunkedExtension' => ''],
-                    ['chunkedExtension' => ''],
-                    ['chunkedExtension' => ''],
+                    ['chunkExtension' => ''],
+                    ['chunkExtension' => ''],
+                    ['chunkExtension' => ''],
+                    ['chunkExtension' => ''],
                 ],
             ],
             [
                 ["4\r\n", "Wiki\r\n", "5\r\n", "pedia\r\ne\r\n in\r\n", "\r\nchunks.\r\n0\r\n\r\n"],
                 [
-                    ['chunkedExtension' => ''],
-                    ['chunkedExtension' => ''],
-                    ['chunkedExtension' => ''],
-                    ['chunkedExtension' => ''],
+                    ['chunkExtension' => ''],
+                    ['chunkExtension' => ''],
+                    ['chunkExtension' => ''],
+                    ['chunkExtension' => ''],
                 ],
             ],
             [
                 ["4\r\n", "Wiki\r\n", "5\r\n", "pedia\r\ne; foo=[bar,beer,pool,cue,win,won]\r\n", " in\r\n", "\r\nchunks.\r\n0\r\n\r\n"],
                 [
-                    ['chunkedExtension' => ''],
-                    ['chunkedExtension' => ''],
-                    ['chunkedExtension' => 'foo=[bar,beer,pool,cue,win,won]'],
-                    ['chunkedExtension' => 'foo=[bar,beer,pool,cue,win,won]'],
+                    ['chunkExtension' => ''],
+                    ['chunkExtension' => ''],
+                    ['chunkExtension' => 'foo=[bar,beer,pool,cue,win,won]'],
+                    ['chunkExtension' => 'foo=[bar,beer,pool,cue,win,won]'],
                 ],
             ],
             [
                 ["4; foo=bar\r\n", "Wiki\r\n", "5\r\n", "pedia\r\ne\r\n", " in\r\n", "\r\nchunks.\r\n", "0\r\n\r\n"],
                 [
-                    ['chunkedExtension' => 'foo=bar'],
-                    ['chunkedExtension' => ''],
-                    ['chunkedExtension' => ''],
-                    ['chunkedExtension' => ''],
+                    ['chunkExtension' => 'foo=bar'],
+                    ['chunkExtension' => ''],
+                    ['chunkExtension' => ''],
+                    ['chunkExtension' => ''],
                 ],
             ],
         ];
