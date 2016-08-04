@@ -49,8 +49,14 @@ class ChunkedStreamDecoder
         $this->buffer .= $data;
 
         do {
+            $bufferLength = strlen($this->buffer);
             $this->iterateBuffer();
-        } while (strlen($this->buffer) > 0 && strpos($this->buffer, static::CRLF) !== false);
+            $iteratedBufferLength = strlen($this->buffer);
+        } while (
+            $bufferLength !== $iteratedBufferLength &&
+            $iteratedBufferLength > 0 &&
+            strpos($this->buffer, static::CRLF) !== false
+        );
     }
 
     protected function iterateBuffer()

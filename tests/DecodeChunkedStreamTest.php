@@ -34,6 +34,22 @@ class DecodeChunkedStreamTest extends TestCase
             [
                 str_split("4\r\nWiki\r\n5\r\npedia\r\ne\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"),
             ],
+            [
+                str_split("6\r\nWi\r\nki\r\n5\r\npedia\r\ne\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"),
+                "Wi\r\nkipedia in\r\n\r\nchunks."
+            ],
+            [
+                ["6\r\nWi\r\n", "ki\r\n5\r\npedia\r\ne\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"],
+                "Wi\r\nkipedia in\r\n\r\nchunks."
+            ],
+            [
+                ["4\r\nWi\r\n", "ki\r\n5\r\npedia\r\ne\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"],
+                "Wi\r\ne\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"
+            ],
+            [
+                str_split("4\r\nWi\r\nki\r\n5\r\npedia\r\ne\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"),
+                "Wi\r\npedia in\r\n\r\nchunks."
+            ],
         ];
     }
 
@@ -41,7 +57,7 @@ class DecodeChunkedStreamTest extends TestCase
      * @test
      * @dataProvider provideChunkedEncoding
      */
-    public function testChunkedEncoding(array $strings)
+    public function testChunkedEncoding(array $strings, $expected = "Wikipedia in\r\n\r\nchunks.")
     {
         $stream = new ThroughStream();
         $response = new ChunkedStreamDecoder($stream);
@@ -52,6 +68,6 @@ class DecodeChunkedStreamTest extends TestCase
         foreach ($strings as $string) {
             $stream->write($string);
         }
-        $this->assertSame("Wikipedia in\r\n\r\nchunks.", $buffer);
+        $this->assertSame($expected, $buffer);
     }
 }
