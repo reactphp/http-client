@@ -31,6 +31,9 @@ class DecodeChunkedStreamTest extends TestCase
             [
                 ["4; foo=bar\r\n", "Wiki\r\n", "5\r\n", "pedia\r\ne\r\n", " in\r\n", "\r\nchunks.\r\n", "0\r\n\r\n"],
             ],
+            [
+                str_split("4\r\nWiki\r\n5\r\npedia\r\ne\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"),
+            ],
         ];
     }
 

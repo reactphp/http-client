@@ -56,8 +56,11 @@ class ChunkedStreamDecoder
     protected function iterateBuffer()
     {
         if ($this->nextChunkIsLength) {
-            $this->nextChunkIsLength = false;
             $crlfPosition = strpos($this->buffer, static::CRLF);
+            if ($crlfPosition === false) {
+                return; // Chunk header hasn't completely come in yet
+            }
+            $this->nextChunkIsLength = false;
             $lengthChunk = substr($this->buffer, 0, $crlfPosition);
             if (strpos($lengthChunk, ';') !== false) {
                 list($lengthChunk) = explode(';', $lengthChunk, 2);
