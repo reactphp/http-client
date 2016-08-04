@@ -68,12 +68,12 @@ class RequestTest extends TestCase
             ->expects($this->at(8))
             ->method('removeListener')
             ->with('error', $this->identicalTo(array($request, 'handleError')));
+        $this->stream
+            ->expects($this->at(9))
+            ->method('emit')
+            ->with('data', array('body'));
 
         $response = $this->response;
-
-        $response->expects($this->once())
-            ->method('emit')
-            ->with('data', array('body', $response));
 
         $response->expects($this->at(0))
             ->method('on')
@@ -249,7 +249,7 @@ class RequestTest extends TestCase
         $this->stream
             ->expects($this->at(4))
             ->method('write')
-            ->with($this->matchesRegularExpression("#^POST / HTTP/1\.0\r\nHost: www.example.com\r\nUser-Agent:.*\r\n\r\n$#"));
+            ->with($this->matchesRegularExpression("#^POST / HTTP/1\.0\r\nHost: www.example.com\r\nUser-Agent:.*\r\nAccept-Encoding: gzip\r\n\r\n$#"));
         $this->stream
             ->expects($this->at(5))
             ->method('write')
@@ -279,7 +279,7 @@ class RequestTest extends TestCase
         $this->stream
             ->expects($this->at(4))
             ->method('write')
-            ->with($this->matchesRegularExpression("#^POST / HTTP/1\.0\r\nHost: www.example.com\r\nUser-Agent:.*\r\n\r\n$#"));
+            ->with($this->matchesRegularExpression("#^POST / HTTP/1\.0\r\nHost: www.example.com\r\nUser-Agent:.*\r\nAccept-Encoding: gzip\r\n\r\n$#"));
         $this->stream
             ->expects($this->at(5))
             ->method('write')
@@ -320,7 +320,7 @@ class RequestTest extends TestCase
         $this->stream
             ->expects($this->at(4))
             ->method('write')
-            ->with($this->matchesRegularExpression("#^POST / HTTP/1\.0\r\nHost: www.example.com\r\nUser-Agent:.*\r\n\r\n$#"));
+            ->with($this->matchesRegularExpression("#^POST / HTTP/1\.0\r\nHost: www.example.com\r\nUser-Agent:.*\r\nAccept-Encoding: gzip\r\n\r\n$#"));
         $this->stream
             ->expects($this->at(5))
             ->method('write')
@@ -367,7 +367,7 @@ class RequestTest extends TestCase
         $this->stream
             ->expects($this->at(4))
             ->method('write')
-            ->with($this->matchesRegularExpression("#^POST / HTTP/1\.0\r\nHost: www.example.com\r\nUser-Agent:.*\r\n\r\n$#"));
+            ->with($this->matchesRegularExpression("#^POST / HTTP/1\.0\r\nHost: www.example.com\r\nUser-Agent:.*\r\nAccept-Encoding: gzip\r\n\r\n$#"));
         $this->stream
             ->expects($this->at(5))
             ->method('write')

@@ -14,6 +14,7 @@ class RequestDataTest extends TestCase
         $expected = "GET / HTTP/1.0\r\n" .
             "Host: www.example.com\r\n" .
             "User-Agent: React/alpha\r\n" .
+            "Accept-Encoding: gzip\r\n" .
             "\r\n";
 
         $this->assertSame($expected, $requestData->__toString());
@@ -28,6 +29,7 @@ class RequestDataTest extends TestCase
         $expected = "GET / HTTP/1.1\r\n" .
             "Host: www.example.com\r\n" .
             "User-Agent: React/alpha\r\n" .
+            "Accept-Encoding: gzip\r\n" .
             "Connection: close\r\n" .
             "\r\n";
 
@@ -42,6 +44,7 @@ class RequestDataTest extends TestCase
         $expected = "GET / HTTP/1.1\r\n" .
             "Host: www.example.com\r\n" .
             "User-Agent: React/alpha\r\n" .
+            "Accept-Encoding: gzip\r\n" .
             "Connection: close\r\n" .
             "\r\n";
 
@@ -56,6 +59,7 @@ class RequestDataTest extends TestCase
         $expected = "GET / HTTP/1.0\r\n" .
             "Host: www.example.com\r\n" .
             "User-Agent: React/alpha\r\n" .
+            "Accept-Encoding: gzip\r\n" .
             "Authorization: Basic am9objpkdW1teQ==\r\n" .
             "\r\n";
 

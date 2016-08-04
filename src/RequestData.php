@@ -25,8 +25,9 @@ class RequestData
 
         return array_merge(
             array(
-                'Host'          => $this->getHost().$port,
-                'User-Agent'    => 'React/alpha',
+                'Host'            => $this->getHost().$port,
+                'User-Agent'      => 'React/alpha',
+                'Accept-Encoding' => 'gzip',
             ),
             $connectionHeaders,
             $authHeaders,

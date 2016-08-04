@@ -156,7 +156,7 @@ class Request implements WritableStreamInterface
 
             $this->emit('response', array($response, $this));
 
-            $response->emit('data', array($bodyChunk, $response));
+            $this->stream->emit('data', array($bodyChunk));
         }
     }
 
@@ -239,10 +239,14 @@ class Request implements WritableStreamInterface
         $this->responseFactory = $factory;
     }
 
-    public function getResponseFactory()
+    public function getResponseFactory($psrResponse = null)
     {
         if (null === $factory = $this->responseFactory) {
             $stream = $this->stream;
+
+            if ($psrResponse != null) {
+                $stream = StreamDecoder::detect($stream, $psrResponse);
+            }
 
             $factory = function ($protocol, $version, $code, $reasonPhrase, $headers) use ($stream) {
                 return new Response(
