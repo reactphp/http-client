@@ -105,11 +105,6 @@ class ChunkedStreamDecoder
         return $bufferLength;
     }
 
-    public function end($data = null)
-    {
-        $this->stream->end($data);
-    }
-
     public function pause()
     {
         $this->stream->pause();
