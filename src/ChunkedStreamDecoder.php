@@ -5,8 +5,9 @@ namespace React\HttpClient;
 use Evenement\EventEmitterTrait;
 use React\Stream\ReadableStreamInterface;
 use React\Stream\Util;
+use React\Stream\WritableStreamInterface;
 
-class ChunkedStreamDecoder
+class ChunkedStreamDecoder implements ReadableStreamInterface
 {
     const CRLF = "\r\n";
 
@@ -113,5 +114,22 @@ class ChunkedStreamDecoder
     public function resume()
     {
         $this->stream->resume();
+    }
+
+    public function isReadable()
+    {
+        return $this->stream->isReadable();
+    }
+
+    public function pipe(WritableStreamInterface $dest, array $options = array())
+    {
+        Util::pipe($this, $dest, $options);
+
+        return $dest;
+    }
+
+    public function close()
+    {
+        return $this->stream->close();
     }
 }
