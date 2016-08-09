@@ -44,6 +44,7 @@ class ChunkedStreamDecoder
         ]);
     }
 
+    /** @internal */
     public function handleData($data)
     {
         $this->buffer .= $data;
