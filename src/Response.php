@@ -37,6 +37,14 @@ class Response implements ReadableStreamInterface
 
         if (isset($normalizedHeaders['transfer-encoding']) && strtolower($normalizedHeaders['transfer-encoding']) === 'chunked') {
             $this->stream = new ChunkedStreamDecoder($stream);
+
+            unset($normalizedHeaders['transfer-encoding']);
+            foreach ($this->headers as $key => $value) {
+                if (strcasecmp('transfer-encoding', $key) === 0) {
+                    unset($this->headers[$key]);
+                    break;
+                }
+            }
         }
 
         $this->stream->on('data', array($this, 'handleData'));

@@ -55,6 +55,13 @@ class ResponseTest extends TestCase
 
         $response->handleData('some data');
         $response->handleEnd();
+
+        $this->assertSame(
+            [
+                'Content-Type' => 'text/plain'
+            ],
+            $response->getHeaders()
+        );
     }
 
     /** @test */
@@ -73,6 +80,13 @@ class ResponseTest extends TestCase
 
         $response->resume();
         $response->pause();
+
+        $this->assertSame(
+            [
+                'content-type' => 'text/plain',
+            ],
+            $response->getHeaders()
+        );
     }
 
     /** @test */
@@ -100,6 +114,13 @@ class ResponseTest extends TestCase
         $this->assertSame('', $buffer);
         $stream->write("Wiki\r\n");
         $this->assertSame('Wiki', $buffer);
+
+        $this->assertSame(
+            [
+                'content-type' => 'text/plain',
+            ],
+            $response->getHeaders()
+        );
     }
 }
 
