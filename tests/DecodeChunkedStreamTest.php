@@ -2,6 +2,7 @@
 
 namespace React\Tests\HttpClient;
 
+use Exception;
 use React\HttpClient\ChunkedStreamDecoder;
 use React\Stream\ThroughStream;
 
@@ -42,14 +43,6 @@ class DecodeChunkedStreamTest extends TestCase
                 ["6\r\nWi\r\n", "ki\r\n5\r\npedia\r\ne\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"],
                 "Wi\r\nkipedia in\r\n\r\nchunks."
             ],
-            [
-                ["4\r\nWi\r\n", "ki\r\n5\r\npedia\r\ne\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"],
-                "Wi\r\ne\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"
-            ],
-            [
-                str_split("4\r\nWi\r\nki\r\n5\r\npedia\r\ne\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"),
-                "Wi\r\npedia in\r\n\r\nchunks."
-            ],
         ];
     }
 
@@ -62,12 +55,44 @@ class DecodeChunkedStreamTest extends TestCase
         $stream = new ThroughStream();
         $response = new ChunkedStreamDecoder($stream);
         $buffer = '';
-        $response->on('data', function ($data, $response) use (&$buffer) {
+        $response->on('data', function ($data) use (&$buffer) {
             $buffer .= $data;
+        });
+        $response->on('error', function (Exception $exception) {
+            throw $exception;
         });
         foreach ($strings as $string) {
             $stream->write($string);
         }
         $this->assertSame($expected, $buffer);
+    }
+
+    public function provideInvalidChunkedEncoding()
+    {
+        return [
+            [
+                ["4\r\nWiwot40n98w3498tw3049nyn039409t34\r\n", "ki\r\n5\r\npedia\r\ne\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"],
+            ],
+            [
+                str_split("xyz\r\nWi\r\nki\r\n5\r\npedia\r\ne\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n")
+            ],
+        ];
+    }
+
+    /**
+     * @test
+     * @dataProvider provideInvalidChunkedEncoding
+     * @expectedException Exception
+     */
+    public function testInvalidChunkedEncoding(array $strings)
+    {
+        $stream = new ThroughStream();
+        $response = new ChunkedStreamDecoder($stream);
+        $response->on('error', function (Exception $exception) {
+            throw $exception;
+        });
+        foreach ($strings as $string) {
+            $stream->write($string);
+        }
     }
 }

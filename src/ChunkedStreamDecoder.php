@@ -3,6 +3,7 @@
 namespace React\HttpClient;
 
 use Evenement\EventEmitterTrait;
+use Exception;
 use React\Stream\ReadableStreamInterface;
 use React\Stream\Util;
 use React\Stream\WritableStreamInterface;
@@ -52,9 +53,10 @@ class ChunkedStreamDecoder implements ReadableStreamInterface
 
         do {
             $bufferLength = strlen($this->buffer);
-            $this->iterateBuffer();
+            $continue = $this->iterateBuffer();
             $iteratedBufferLength = strlen($this->buffer);
         } while (
+            $continue &&
             $bufferLength !== $iteratedBufferLength &&
             $iteratedBufferLength > 0 &&
             strpos($this->buffer, static::CRLF) !== false
@@ -66,21 +68,30 @@ class ChunkedStreamDecoder implements ReadableStreamInterface
         if ($this->nextChunkIsLength) {
             $crlfPosition = strpos($this->buffer, static::CRLF);
             if ($crlfPosition === false) {
-                return; // Chunk header hasn't completely come in yet
+                return false; // Chunk header hasn't completely come in yet
             }
             $this->nextChunkIsLength = false;
             $lengthChunk = substr($this->buffer, 0, $crlfPosition);
             if (strpos($lengthChunk, ';') !== false) {
                 list($lengthChunk) = explode(';', $lengthChunk, 2);
             }
+            $lengthChunk = trim($lengthChunk, "\r\n");
+            if (!ctype_xdigit($lengthChunk)) {
+                $this->stream->close();
+                $this->emit('error', [
+                    new Exception($this->buffer.'Unable to validate "' . $lengthChunk . '" as chunk length header"' . $crlfPosition),
+                ]);
+                return false;
+            }
             $this->remainingLength = hexdec($lengthChunk);
             $this->buffer = substr($this->buffer, $crlfPosition + 2);
+            return true;
         }
 
         if ($this->remainingLength > 0) {
             $chunkLength = $this->getChunkLength();
             if ($chunkLength === 0) {
-                return;
+                return true;
             }
             $this->emit('data', array(
                 substr($this->buffer, 0, $chunkLength),
@@ -88,11 +99,12 @@ class ChunkedStreamDecoder implements ReadableStreamInterface
             ));
             $this->remainingLength -= $chunkLength;
             $this->buffer = substr($this->buffer, $chunkLength);
-            return;
+            return true;
         }
 
         $this->nextChunkIsLength = true;
         $this->buffer = substr($this->buffer, 2);
+        return true;
     }
 
     protected function getChunkLength()
