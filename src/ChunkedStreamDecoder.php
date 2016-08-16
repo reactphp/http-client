@@ -79,7 +79,7 @@ class ChunkedStreamDecoder implements ReadableStreamInterface
             if (!ctype_xdigit($lengthChunk)) {
                 $this->stream->close();
                 $this->emit('error', [
-                    new Exception($this->buffer.'Unable to validate "' . $lengthChunk . '" as chunk length header"' . $crlfPosition),
+                    new Exception('Unable to validate "' . $lengthChunk . '" as chunk length header"'),
                 ]);
                 return false;
             }
