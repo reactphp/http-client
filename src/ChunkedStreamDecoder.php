@@ -82,7 +82,7 @@ class ChunkedStreamDecoder implements ReadableStreamInterface
 
     protected function iterateBuffer()
     {
-        if (strlen($this->buffer) <= 2) {
+        if (strlen($this->buffer) <= 1) {
             return false;
         }
 
