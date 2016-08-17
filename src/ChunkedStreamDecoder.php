@@ -77,10 +77,10 @@ class ChunkedStreamDecoder implements ReadableStreamInterface
             }
             $lengthChunk = trim($lengthChunk, "\r\n");
             if (!ctype_xdigit($lengthChunk)) {
-                $this->stream->close();
                 $this->emit('error', [
                     new Exception('Unable to validate "' . $lengthChunk . '" as chunk length header"'),
                 ]);
+                $this->close();
                 return false;
             }
             $this->remainingLength = hexdec($lengthChunk);
