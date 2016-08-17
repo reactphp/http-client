@@ -82,6 +82,10 @@ class ChunkedStreamDecoder implements ReadableStreamInterface
 
     protected function iterateBuffer()
     {
+        if (strlen($this->buffer) <= 2) {
+            return false;
+        }
+
         if ($this->nextChunkIsLength) {
             $crlfPosition = strpos($this->buffer, static::CRLF);
             if ($crlfPosition === false) {
@@ -92,7 +96,6 @@ class ChunkedStreamDecoder implements ReadableStreamInterface
             if (strpos($lengthChunk, ';') !== false) {
                 list($lengthChunk) = explode(';', $lengthChunk, 2);
             }
-            $lengthChunk = trim($lengthChunk);
             if (dechex(hexdec($lengthChunk)) !== $lengthChunk) {
                 $this->emit('error', [
                     new Exception('Unable to validate "' . $lengthChunk . '" as chunk length header"'),
