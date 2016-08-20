@@ -67,6 +67,10 @@ class ChunkedStreamDecoder implements ReadableStreamInterface
             $iteratedBufferLength > 0 &&
             strpos($this->buffer, static::CRLF) !== false
         );
+
+        if ($this->buffer === false) {
+            $this->buffer = '';
+        }
     }
 
     protected function iterateBuffer()
