@@ -28,7 +28,7 @@ class ChunkedStreamDecoder implements ReadableStreamInterface
     /**
      * @var int
      */
-    protected $maxBufferLength;
+    protected $maxChunkLength;
 
     /**
      * @var bool
@@ -42,16 +42,16 @@ class ChunkedStreamDecoder implements ReadableStreamInterface
 
     /**
      * @param ReadableStreamInterface $stream
-     * @param int $maxBufferLength
+     * @param int $maxChunkLength
      */
-    public function __construct(ReadableStreamInterface $stream, $maxBufferLength = self::MAX_BUFFER_LENGTH)
+    public function __construct(ReadableStreamInterface $stream, $maxChunkLength = self::MAX_BUFFER_LENGTH)
     {
         $this->stream = $stream;
         $this->stream->on('data', array($this, 'handleData'));
         Util::forwardEvents($this->stream, $this, [
             'error',
         ]);
-        $this->maxBufferLength = $maxBufferLength;
+        $this->maxChunkLength = $maxChunkLength;
     }
 
     /** @internal */
@@ -68,12 +68,12 @@ class ChunkedStreamDecoder implements ReadableStreamInterface
             $bufferLength !== $iteratedBufferLength &&
             $iteratedBufferLength > 0 &&
             strpos($this->buffer, static::CRLF) !== false &&
-            $iteratedBufferLength <= $this->maxBufferLength
+            $iteratedBufferLength <= $this->maxChunkLength
         );
 
-        if ($iteratedBufferLength >= $this->maxBufferLength) {
+        if ($iteratedBufferLength >= $this->maxChunkLength) {
             $this->emit('error', [
-                new Exception('The current buffer is longer then the ' . $this->maxBufferLength / 1024 . 'KB we have set as maximum'),
+                new Exception('The current buffer is longer then the ' . $this->maxChunkLength / 1024 . 'KB we have set as maximum'),
             ]);
             $this->close();
             return false;
@@ -104,9 +104,9 @@ class ChunkedStreamDecoder implements ReadableStreamInterface
                 return false;
             }
             $this->remainingLength = hexdec($lengthChunk);
-            if ($this->remainingLength >= $this->maxBufferLength) {
+            if ($this->remainingLength >= $this->maxChunkLength) {
                 $this->emit('error', [
-                    new Exception('Expected chunk length is longer then the ' . $this->maxBufferLength / 1024 . 'KB we have set as maximum'),
+                    new Exception('Expected chunk length is longer then the ' . $this->maxChunkLength / 1024 . 'KB we have set as maximum'),
                 ]);
                 $this->close();
                 return false;
