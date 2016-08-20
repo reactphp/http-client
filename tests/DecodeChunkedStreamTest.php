@@ -76,12 +76,6 @@ class DecodeChunkedStreamTest extends TestCase
             [
                 str_split("xyz\r\nWi\r\nki\r\n5\r\npedia\r\ne\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n")
             ],
-            [
-                str_split("1\r\n" . str_repeat('a', ChunkedStreamDecoder::MAX_BUFFER_LENGTH + 1) . "\r\n0\r\n\r\n")
-            ],
-            [
-                [dechex(ChunkedStreamDecoder::MAX_BUFFER_LENGTH + 1) . "\r\n0\r\n\r\n"],
-            ],
         ];
     }
 
