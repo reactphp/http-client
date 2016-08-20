@@ -35,12 +35,18 @@ class ChunkedStreamDecoder implements ReadableStreamInterface
     protected $stream;
 
     /**
+     * @var bool
+     */
+    protected $closed = false;
+
+    /**
      * @param ReadableStreamInterface $stream
      */
     public function __construct(ReadableStreamInterface $stream)
     {
         $this->stream = $stream;
         $this->stream->on('data', array($this, 'handleData'));
+        $this->stream->on('end',  array($this, 'handleEnd'));
         Util::forwardEvents($this->stream, $this, [
             'error',
         ]);
@@ -152,6 +158,29 @@ class ChunkedStreamDecoder implements ReadableStreamInterface
 
     public function close()
     {
+        $this->closed = true;
         return $this->stream->close();
+    }
+
+    /** @internal */
+    public function handleEnd()
+    {
+        if ($this->closed) {
+            return;
+        }
+
+        if ($this->buffer === '') {
+            $this->emit('end');
+            $this->close();
+            return;
+        }
+
+        $this->emit(
+            'error',
+            [
+                new Exception('Stream ended with incomplete control code')
+            ]
+        );
+        $this->close();
     }
 }

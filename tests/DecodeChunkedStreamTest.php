@@ -98,4 +98,32 @@ class DecodeChunkedStreamTest extends TestCase
             $stream->write($string);
         }
     }
+
+    public function testHandleEnd()
+    {
+        $ended = false;
+        $stream = new ThroughStream();
+        $response = new ChunkedStreamDecoder($stream);
+        $response->on('end', function () use (&$ended) {
+            $ended = true;
+        });
+
+        $stream->end("4\r\nWiki\r\n0\r\n\r\n");
+
+        $this->assertTrue($ended);
+    }
+
+    public function testHandleEndIncomplete()
+    {
+        $exception = null;
+        $stream = new ThroughStream();
+        $response = new ChunkedStreamDecoder($stream);
+        $response->on('error', function ($e) use (&$exception) {
+            $exception = $e;
+        });
+
+        $stream->end("4\r\nWiki");
+
+        $this->assertInstanceOf('Exception', $exception);
+    }
 }
