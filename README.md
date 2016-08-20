@@ -24,7 +24,7 @@ Interesting events emitted by Request:
 Interesting events emitted by Response:
 
 * `data`: Passes a chunk of the response body as first argument and a Response
-  object itself as second argument.
+  object itself as second argument. When a response encounters a chunked encoded response it will parse it transparently for the user of `Response` and removing the `Transfer-Encoding` header.
 * `error`: An error occurred.
 * `end`: The response has been fully received. If an error
   occurred, it is passed as first argument.
