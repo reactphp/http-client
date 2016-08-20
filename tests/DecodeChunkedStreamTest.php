@@ -76,6 +76,9 @@ class DecodeChunkedStreamTest extends TestCase
             [
                 str_split("xyz\r\nWi\r\nki\r\n5\r\npedia\r\ne\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n")
             ],
+            [
+                str_split(str_repeat('a', 2015) . "\r\nWi\r\nki\r\n5\r\npedia\r\ne\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n")
+            ],
         ];
     }
 

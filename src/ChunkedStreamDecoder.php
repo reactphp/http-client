@@ -71,6 +71,13 @@ class ChunkedStreamDecoder implements ReadableStreamInterface
 
         if ($this->nextChunkIsLength) {
             $crlfPosition = strpos($this->buffer, static::CRLF);
+            if ($crlfPosition === false && strlen($this->buffer) > 1024) {
+                $this->emit('error', [
+                    new Exception('Chunk length header longer then 1024 bytes'),
+                ]);
+                $this->close();
+                return false;
+            }
             if ($crlfPosition === false) {
                 return false; // Chunk header hasn't completely come in yet
             }
