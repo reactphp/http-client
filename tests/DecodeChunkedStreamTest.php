@@ -108,7 +108,7 @@ class DecodeChunkedStreamTest extends TestCase
             $ended = true;
         });
 
-        $stream->end("4\r\nWiki\r\n0\r\n\r\n");
+        $stream->write("4\r\nWiki\r\n0\r\n\r\n");
 
         $this->assertTrue($ended);
     }
