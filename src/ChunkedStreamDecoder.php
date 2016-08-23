@@ -40,6 +40,11 @@ class ChunkedStreamDecoder implements ReadableStreamInterface
     protected $closed = false;
 
     /**
+     * @var bool
+     */
+    protected $reachedEnd = false;
+
+    /**
      * @param ReadableStreamInterface $stream
      */
     public function __construct(ReadableStreamInterface $stream)
@@ -64,8 +69,7 @@ class ChunkedStreamDecoder implements ReadableStreamInterface
         } while (
             $continue &&
             $bufferLength !== $iteratedBufferLength &&
-            $iteratedBufferLength > 0 &&
-            strpos($this->buffer, static::CRLF) !== false
+            $iteratedBufferLength > 0
         );
 
         if ($this->buffer === false) {
@@ -126,6 +130,7 @@ class ChunkedStreamDecoder implements ReadableStreamInterface
         $this->buffer = substr($this->buffer, 2);
 
         if (substr($this->buffer, 0, 5) === "0\r\n\r\n") {
+            $this->reachedEnd = true;
             $this->emit('end');
             $this->close();
             return false;
@@ -179,7 +184,7 @@ class ChunkedStreamDecoder implements ReadableStreamInterface
             return;
         }
 
-        if ($this->buffer === '') {
+        if ($this->buffer === '' && $this->reachedEnd) {
             $this->emit('end');
             $this->close();
             return;
