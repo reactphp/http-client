@@ -126,9 +126,8 @@ class ChunkedStreamDecoder implements ReadableStreamInterface
         $this->buffer = substr($this->buffer, 2);
 
         if (substr($this->buffer, 0, 5) === "0\r\n\r\n") {
-            $this->stream->removeListener('data', array($this, 'handleData'));
-            $this->stream->removeListener('end',  array($this, 'handleEnd'));
             $this->emit('end');
+            $this->close();
             return false;
         }
         return true;
