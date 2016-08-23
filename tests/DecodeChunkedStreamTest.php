@@ -126,4 +126,18 @@ class DecodeChunkedStreamTest extends TestCase
 
         $this->assertInstanceOf('Exception', $exception);
     }
+
+    public function testHandleEndTrailers()
+    {
+        $ended = false;
+        $stream = new ThroughStream();
+        $response = new ChunkedStreamDecoder($stream);
+        $response->on('end', function () use (&$ended) {
+            $ended = true;
+        });
+
+        $stream->write("4\r\nWiki\r\n0\r\nabc: def\r\nghi: klm\r\n\r\n");
+
+        $this->assertTrue($ended);
+    }
 }

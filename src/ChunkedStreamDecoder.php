@@ -129,7 +129,7 @@ class ChunkedStreamDecoder implements ReadableStreamInterface
         $this->nextChunkIsLength = true;
         $this->buffer = substr($this->buffer, 2);
 
-        if (substr($this->buffer, 0, 5) === "0\r\n\r\n") {
+        if (substr($this->buffer, 0, 3) === "0\r\n") {
             $this->reachedEnd = true;
             $this->emit('end');
             $this->close();
