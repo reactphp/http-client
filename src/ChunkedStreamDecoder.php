@@ -8,6 +8,9 @@ use React\Stream\ReadableStreamInterface;
 use React\Stream\Util;
 use React\Stream\WritableStreamInterface;
 
+/**
+ * @internal
+ */
 class ChunkedStreamDecoder implements ReadableStreamInterface
 {
     const CRLF = "\r\n";
