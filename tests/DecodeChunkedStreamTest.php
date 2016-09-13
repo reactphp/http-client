@@ -11,35 +11,35 @@ class DecodeChunkedStreamTest extends TestCase
     public function provideChunkedEncoding()
     {
         return [
-            [
+            'data-set-1' => [
                 ["4\r\nWiki\r\n5\r\npedia\r\ne\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"],
             ],
-            [
+            'data-set-2' => [
                 ["4\r\nWiki\r\n", "5\r\npedia\r\ne\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"],
             ],
-            [
+            'data-set-3' => [
                 ["4\r\nWiki\r\n", "5\r\n", "pedia\r\ne\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"],
             ],
-            [
+            'data-set-4' => [
                 ["4\r\nWiki\r\n", "5\r\n", "pedia\r\ne\r\n in\r\n", "\r\nchunks.\r\n0\r\n\r\n"],
             ],
-            [
+            'data-set-5' => [
                 ["4\r\n", "Wiki\r\n", "5\r\n", "pedia\r\ne\r\n in\r\n", "\r\nchunks.\r\n0\r\n\r\n"],
             ],
-            [
+            'data-set-6' => [
                 ["4\r\n", "Wiki\r\n", "5\r\n", "pedia\r\ne; foo=[bar,beer,pool,cue,win,won]\r\n", " in\r\n", "\r\nchunks.\r\n0\r\n\r\n"],
             ],
-            [
+            'header-fields' => [
                 ["4; foo=bar\r\n", "Wiki\r\n", "5\r\n", "pedia\r\ne\r\n", " in\r\n", "\r\nchunks.\r\n", "0\r\n\r\n"],
             ],
-            [
+            'character-for-charactrr' => [
                 str_split("4\r\nWiki\r\n5\r\npedia\r\ne\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"),
             ],
-            [
+            'extra-newline-in-wiki-character-for-chatacter' => [
                 str_split("6\r\nWi\r\nki\r\n5\r\npedia\r\ne\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"),
                 "Wi\r\nkipedia in\r\n\r\nchunks."
             ],
-            [
+            'extra-newline-in-wiki' => [
                 ["6\r\nWi\r\n", "ki\r\n5\r\npedia\r\ne\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"],
                 "Wi\r\nkipedia in\r\n\r\nchunks."
             ],
