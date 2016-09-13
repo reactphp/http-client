@@ -70,13 +70,13 @@ class DecodeChunkedStreamTest extends TestCase
     public function provideInvalidChunkedEncoding()
     {
         return [
-            [
+            'chunk-body-longer-than-header-suggests' => [
                 ["4\r\nWiwot40n98w3498tw3049nyn039409t34\r\n", "ki\r\n5\r\npedia\r\ne\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"],
             ],
-            [
+            'invalid-header-charactrrs' => [
                 str_split("xyz\r\nWi\r\nki\r\n5\r\npedia\r\ne\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n")
             ],
-            [
+            'header-chunk-to-long' => [
                 str_split(str_repeat('a', 2015) . "\r\nWi\r\nki\r\n5\r\npedia\r\ne\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n")
             ],
         ];
