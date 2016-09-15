@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.11 (2016-09-15)
+
+* Feature: Chunked encoding @WyriHaximus
+
 ## 0.4.10 (2016-03-21)
 
 * Improvement: Update react/socket-client dependency to all supported versions @clue
@@ -11,7 +15,7 @@
 
 ## 0.4.8 (2015-10-05)
 
-* Improvement: Avoid hidding exceptions thrown in HttpClient\Request error handlers @arnaud-lb
+* Improvement: Avoid hiding exceptions thrown in HttpClient\Request error handlers @arnaud-lb
 
 ## 0.4.7 (2015-09-24)
 
