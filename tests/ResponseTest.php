@@ -16,7 +16,8 @@ class ResponseTest extends TestCase
             ->getMock();
     }
 
-    public function _responseShouldEmitEndEventOnEnd()
+    /** @test */
+    public function responseShouldEmitEndEventOnEnd()
     {
         $this->stream
             ->expects($this->at(0))
