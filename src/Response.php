@@ -107,6 +107,7 @@ class Response implements ReadableStreamInterface
         $this->emit('end', array($error, $this));
 
         $this->removeAllListeners();
+        $this->stream->close();
     }
 
     public function isReadable()

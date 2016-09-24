@@ -16,8 +16,7 @@ class ResponseTest extends TestCase
             ->getMock();
     }
 
-    /** @test */
-    public function responseShouldEmitEndEventOnEnd()
+    public function _responseShouldEmitEndEventOnEnd()
     {
         $this->stream
             ->expects($this->at(0))
@@ -48,6 +47,10 @@ class ResponseTest extends TestCase
 
         $response->on('end', $handler);
         $response->on('close', $this->expectCallableNever());
+
+        $this->stream
+            ->expects($this->at(0))
+            ->method('close');
 
         $response->handleData('some data');
         $response->handleEnd();
