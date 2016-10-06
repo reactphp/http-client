@@ -51,7 +51,7 @@ class ResponseTest extends TestCase
 
         $this->stream
             ->expects($this->at(0))
-            ->method('end');
+            ->method('close');
 
         $response->handleData('some data');
         $response->handleEnd();
