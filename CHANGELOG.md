@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.12 (2016-10-06)
+
+* Fix: Changed $stream from DuplexStreamInterface to ReadableStreamInterface in Response constructor #63 @WyriHaximus
+
 ## 0.4.11 (2016-09-15)
 
 * Feature: Chunked encoding @WyriHaximus
