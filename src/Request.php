@@ -222,7 +222,7 @@ class Request implements WritableStreamInterface
             $headers
         );
 
-        return array($response, $psrResponse->getBody());
+        return array($response, (string)($psrResponse->getBody()));
     }
 
     protected function connect()
