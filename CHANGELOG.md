@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.13 (2016-10-13)
+
+* Fix: Ensure Request emits initial Response data as string #66 @mmelvin0 
+
 ## 0.4.12 (2016-10-06)
 
 * Fix: Changed $stream from DuplexStreamInterface to ReadableStreamInterface in Response constructor #63 @WyriHaximus
