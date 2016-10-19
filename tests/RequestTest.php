@@ -73,7 +73,7 @@ class RequestTest extends TestCase
 
         $response->expects($this->once())
             ->method('emit')
-            ->with('data', array('body', $response));
+            ->with('data', $this->identicalTo(array('body', $response)));
 
         $response->expects($this->at(0))
             ->method('on')
