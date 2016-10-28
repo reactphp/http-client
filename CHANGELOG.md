@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.14 (2016-10-28)
+
+* Fix: Ensure the first bit of body directly after the headers is emitted into the stream #68 @WyriHaximus 
+
 ## 0.4.13 (2016-10-13)
 
 * Fix: Ensure Request emits initial Response data as string #66 @mmelvin0 
