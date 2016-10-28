@@ -71,7 +71,7 @@ class RequestTest extends TestCase
 
         $response = $this->response;
 
-        $response->expects($this->once())
+        $this->stream->expects($this->once())
             ->method('emit')
             ->with('data', $this->identicalTo(array('body', $response)));
 
@@ -532,5 +532,32 @@ class RequestTest extends TestCase
 
         $this->assertNotNull($errorCallback);
         call_user_func($errorCallback, new \Exception('test'));
+    }
+
+    /** @test */
+    public function chunkedStreamDecoder()
+    {
+        $requestData = new RequestData('GET', 'http://www.example.com');
+        $request = new Request($this->connector, $requestData);
+
+        $this->successfulConnectionMock();
+
+        $request->end();
+
+        $this->stream->expects($this->once())
+            ->method('emit')
+            ->with('data', $this->anything())
+            ->will($this->returnCallback(function ($event, $data) {
+                $this->assertTrue(is_array($data));
+                $this->assertSame(2, count($data));
+                $this->assertSame("1\r\nb\r", $data[0]);
+                $this->assertInstanceOf('React\HttpClient\Response', $data[1]);
+            }));
+
+        $request->handleData("HTTP/1.0 200 OK\r\n");
+        $request->handleData("Transfer-Encoding: chunked\r\n");
+        $request->handleData("\r\n1\r\nb\r");
+        $request->handleData("\n3\t\nody\r\n0\t\n\r\n");
+
     }
 }
