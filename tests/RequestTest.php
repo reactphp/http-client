@@ -73,7 +73,7 @@ class RequestTest extends TestCase
 
         $this->stream->expects($this->once())
             ->method('emit')
-            ->with('data', $this->identicalTo(array('body', $response)));
+            ->with('data', $this->identicalTo(array('body')));
 
         $response->expects($this->at(0))
             ->method('on')
@@ -546,13 +546,7 @@ class RequestTest extends TestCase
 
         $this->stream->expects($this->once())
             ->method('emit')
-            ->with('data', $this->anything())
-            ->will($this->returnCallback(function ($event, $data) {
-                $this->assertTrue(is_array($data));
-                $this->assertSame(2, count($data));
-                $this->assertSame("1\r\nb\r", $data[0]);
-                $this->assertInstanceOf('React\HttpClient\Response', $data[1]);
-            }));
+            ->with('data', ["1\r\nb\r"]);
 
         $request->handleData("HTTP/1.0 200 OK\r\n");
         $request->handleData("Transfer-Encoding: chunked\r\n");
