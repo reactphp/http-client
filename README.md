@@ -52,6 +52,8 @@ $request->end();
 $loop->run();
 ```
 
+See also the [examples](examples).
+
 ## TODO
 
 * gzip content encoding
