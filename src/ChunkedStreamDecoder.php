@@ -87,6 +87,14 @@ class ChunkedStreamDecoder implements ReadableStreamInterface
         }
 
         if ($this->nextChunkIsLength) {
+            if (substr($this->buffer, 0, 3) === "0\r\n") {
+                // We've reached the end of the stream
+                $this->reachedEnd = true;
+                $this->emit('end');
+                $this->close();
+                return false;
+            }
+
             $crlfPosition = strpos($this->buffer, static::CRLF);
             if ($crlfPosition === false && strlen($this->buffer) > 1024) {
                 $this->emit('error', [
@@ -131,13 +139,6 @@ class ChunkedStreamDecoder implements ReadableStreamInterface
 
         $this->nextChunkIsLength = true;
         $this->buffer = substr($this->buffer, 2);
-
-        if (substr($this->buffer, 0, 3) === "0\r\n") {
-            $this->reachedEnd = true;
-            $this->emit('end');
-            $this->close();
-            return false;
-        }
         return true;
     }
 
@@ -183,6 +184,8 @@ class ChunkedStreamDecoder implements ReadableStreamInterface
     /** @internal */
     public function handleEnd()
     {
+        $this->handleData('');
+
         if ($this->closed) {
             return;
         }

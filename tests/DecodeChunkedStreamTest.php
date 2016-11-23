@@ -58,8 +58,8 @@ class DecodeChunkedStreamTest extends TestCase
         $response->on('data', function ($data) use (&$buffer) {
             $buffer .= $data;
         });
-        $response->on('error', function (Exception $exception) {
-            throw $exception;
+        $response->on('error', function ($error) {
+            $this->fail((string)$error);
         });
         foreach ($strings as $string) {
             $stream->write($string);
@@ -104,6 +104,9 @@ class DecodeChunkedStreamTest extends TestCase
         $ended = false;
         $stream = new ThroughStream();
         $response = new ChunkedStreamDecoder($stream);
+        $response->on('error', function ($error) {
+            $this->fail((string)$error);
+        });
         $response->on('end', function () use (&$ended) {
             $ended = true;
         });
@@ -132,11 +135,33 @@ class DecodeChunkedStreamTest extends TestCase
         $ended = false;
         $stream = new ThroughStream();
         $response = new ChunkedStreamDecoder($stream);
+        $response->on('error', function ($error) {
+            $this->fail((string)$error);
+        });
         $response->on('end', function () use (&$ended) {
             $ended = true;
         });
 
         $stream->write("4\r\nWiki\r\n0\r\nabc: def\r\nghi: klm\r\n\r\n");
+
+        $this->assertTrue($ended);
+    }
+
+    public function testHandleEndEnsureNoError()
+    {
+        $ended = false;
+        $stream = new ThroughStream();
+        $response = new ChunkedStreamDecoder($stream);
+        $response->on('error', function ($error) {
+            $this->fail((string)$error);
+        });
+        $response->on('end', function () use (&$ended) {
+            $ended = true;
+        });
+
+        $stream->write("4\r\nWiki\r\n");
+        $stream->write("0\r\n\r\n");
+        $stream->end();
 
         $this->assertTrue($ended);
     }
