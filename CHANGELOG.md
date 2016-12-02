@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.15 (2016-12-02)
+
+* Improvement: Add examples #69 @clue
+* Fix: Ensure checking for 0 length chunk, when we should check for it #71 @WyriHaximus 
+
 ## 0.4.14 (2016-10-28)
 
 * Fix: Ensure the first bit of body directly after the headers is emitted into the stream #68 @WyriHaximus 
