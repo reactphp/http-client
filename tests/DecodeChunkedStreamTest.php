@@ -43,6 +43,16 @@ class DecodeChunkedStreamTest extends TestCase
                 ["6\r\nWi\r\n", "ki\r\n5\r\npedia\r\ne\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"],
                 "Wi\r\nkipedia in\r\n\r\nchunks."
             ],
+            'varnish-type-response-1' => [
+                ["0017\r\nWikipedia in\r\n\r\nchunks.\r\n0\r\n\r\n"]
+            ],
+            'varnish-type-response-2' => [
+                ["004\r\nWiki\r\n005\r\npedia\r\n00e\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"]
+            ],
+            'varnish-type-response-extra-line' => [
+                ["006\r\nWi\r\nki\r\n005\r\npedia\r\n00e\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"],
+                "Wi\r\nkipedia in\r\n\r\nchunks."
+            ]
         ];
     }
 
