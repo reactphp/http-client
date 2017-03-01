@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.16 (2017-03-01)
+
+* Fix: Trim leading zeros from chunk size #73 @maciejmrozinski 
+
 ## 0.4.15 (2016-12-02)
 
 * Improvement: Add examples #69 @clue
