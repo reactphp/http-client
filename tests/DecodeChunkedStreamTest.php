@@ -43,6 +43,37 @@ class DecodeChunkedStreamTest extends TestCase
                 ["6\r\nWi\r\n", "ki\r\n5\r\npedia\r\ne\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"],
                 "Wi\r\nkipedia in\r\n\r\nchunks."
             ],
+            'varnish-type-response-1' => [
+                ["0017\r\nWikipedia in\r\n\r\nchunks.\r\n0\r\n\r\n"]
+            ],
+            'varnish-type-response-2' => [
+                ["000017\r\nWikipedia in\r\n\r\nchunks.\r\n0\r\n\r\n"]
+            ],
+            'varnish-type-response-3' => [
+                ["017\r\nWikipedia in\r\n\r\nchunks.\r\n0\r\n\r\n"]
+            ],
+            'varnish-type-response-4' => [
+                ["004\r\nWiki\r\n005\r\npedia\r\n00e\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"]
+            ],
+            'varnish-type-response-5' => [
+                ["000004\r\nWiki\r\n00005\r\npedia\r\n000e\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"]
+            ],
+            'varnish-type-response-extra-line' => [
+                ["006\r\nWi\r\nki\r\n005\r\npedia\r\n00e\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"],
+                "Wi\r\nkipedia in\r\n\r\nchunks."
+            ],
+            'varnish-type-response-random' => [
+                [str_repeat("0", rand(0, 10)), "4\r\nWiki\r\n", str_repeat("0", rand(0, 10)), "5\r\npedia\r\n", str_repeat("0", rand(0, 10)), "e\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"]
+            ],
+            'end-chunk-zero-check-1' => [
+                ["4\r\nWiki\r\n5\r\npedia\r\ne\r\n in\r\n\r\nchunks.\r\n00\r\n\r\n"]
+            ],
+            'end-chunk-zero-check-2' => [
+                ["4\r\nWiki\r\n5\r\npedia\r\ne\r\n in\r\n\r\nchunks.\r\n000\r\n\r\n"]
+            ],
+            'end-chunk-zero-check-3' => [
+                ["00004\r\nWiki\r\n005\r\npedia\r\ne\r\n in\r\n\r\nchunks.\r\n0000\r\n\r\n"]
+            ]
         ];
     }
 
@@ -78,7 +109,7 @@ class DecodeChunkedStreamTest extends TestCase
             ],
             'header-chunk-to-long' => [
                 str_split(str_repeat('a', 2015) . "\r\nWi\r\nki\r\n5\r\npedia\r\ne\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n")
-            ],
+            ]
         ];
     }
 
