@@ -21,7 +21,8 @@ class RequestTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->connector = $this->getMock('React\SocketClient\ConnectorInterface');
+        $this->connector = $this->getMockBuilder('React\SocketClient\ConnectorInterface')
+            ->getMock();
 
         $this->response = $this->getMockBuilder('React\HttpClient\Response')
             ->disableOriginalConstructor()
@@ -386,7 +387,9 @@ class RequestTest extends TestCase
             ->method('__invoke')
             ->will($this->returnValue($this->response));
 
-        $loop = $this->getMock('React\EventLoop\LoopInterface');
+        $loop = $this
+            ->getMockBuilder('React\EventLoop\LoopInterface')
+            ->getMock();
 
         $request->setResponseFactory($factory);
 
