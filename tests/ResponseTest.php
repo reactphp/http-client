@@ -11,7 +11,7 @@ class ResponseTest extends TestCase
 
     public function setUp()
     {
-        $this->stream = $this->getMockbuilder('React\Stream\Stream')
+        $this->stream = $this->getMockBuilder('React\Stream\Stream')
             ->disableOriginalConstructor()
             ->getMock();
     }

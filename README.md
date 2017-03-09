@@ -59,3 +59,18 @@ See also the [examples](examples).
 * gzip content encoding
 * keep-alive connections
 * following redirections
+
+## Tests
+
+To run the test suite, you first need to clone this repo and then install all
+dependencies [through Composer](https://getcomposer.org):
+
+```bash
+$ composer install
+```
+
+To run the test suite, go to the project root and run:
+
+```bash
+$ php vendor/bin/phpunit
+```
