@@ -634,8 +634,9 @@ class RequestTest extends TestCase
             ->with('www.example.com:80')
             ->will($this->returnValue($deferred->promise()));
 
-        return function () use ($deferred) {
-            $deferred->resolve($this->stream);
+        $stream = $this->stream;
+        return function () use ($deferred, $stream) {
+            $deferred->resolve($stream);
         };
     }
 
@@ -699,7 +700,7 @@ class RequestTest extends TestCase
 
         $this->stream->expects($this->once())
             ->method('emit')
-            ->with('data', ["1\r\nb\r"]);
+            ->with('data', array("1\r\nb\r"));
 
         $request->handleData("HTTP/1.0 200 OK\r\n");
         $request->handleData("Transfer-Encoding: chunked\r\n");

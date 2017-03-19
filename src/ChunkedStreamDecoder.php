@@ -2,7 +2,7 @@
 
 namespace React\HttpClient;
 
-use Evenement\EventEmitterTrait;
+use Evenement\EventEmitter;
 use Exception;
 use React\Stream\ReadableStreamInterface;
 use React\Stream\Util;
@@ -11,11 +11,9 @@ use React\Stream\WritableStreamInterface;
 /**
  * @internal
  */
-class ChunkedStreamDecoder implements ReadableStreamInterface
+class ChunkedStreamDecoder extends EventEmitter implements ReadableStreamInterface
 {
     const CRLF = "\r\n";
-
-    use EventEmitterTrait;
 
     /**
      * @var string
@@ -55,9 +53,9 @@ class ChunkedStreamDecoder implements ReadableStreamInterface
         $this->stream = $stream;
         $this->stream->on('data', array($this, 'handleData'));
         $this->stream->on('end',  array($this, 'handleEnd'));
-        Util::forwardEvents($this->stream, $this, [
+        Util::forwardEvents($this->stream, $this, array(
             'error',
-        ]);
+        ));
     }
 
     /** @internal */
@@ -89,9 +87,9 @@ class ChunkedStreamDecoder implements ReadableStreamInterface
         if ($this->nextChunkIsLength) {
             $crlfPosition = strpos($this->buffer, static::CRLF);
             if ($crlfPosition === false && strlen($this->buffer) > 1024) {
-                $this->emit('error', [
+                $this->emit('error', array(
                     new Exception('Chunk length header longer then 1024 bytes'),
-                ]);
+                ));
                 $this->close();
                 return false;
             }
@@ -114,9 +112,9 @@ class ChunkedStreamDecoder implements ReadableStreamInterface
             }
             $this->nextChunkIsLength = false;
             if (dechex(hexdec($lengthChunk)) !== strtolower($lengthChunk)) {
-                $this->emit('error', [
+                $this->emit('error', array(
                     new Exception('Unable to validate "' . $lengthChunk . '" as chunk length header'),
-                ]);
+                ));
                 $this->close();
                 return false;
             }
@@ -200,9 +198,9 @@ class ChunkedStreamDecoder implements ReadableStreamInterface
 
         $this->emit(
             'error',
-            [
+            array(
                 new Exception('Stream ended with incomplete control code')
-            ]
+            )
         );
         $this->close();
     }

@@ -19,7 +19,7 @@ class Client
         $this->connector = $connector;
     }
 
-    public function request($method, $url, array $headers = [], $protocolVersion = '1.0')
+    public function request($method, $url, array $headers = array(), $protocolVersion = '1.0')
     {
         $requestData = new RequestData($method, $url, $headers, $protocolVersion);
 

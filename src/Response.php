@@ -12,9 +12,8 @@ use React\Stream\WritableStreamInterface;
  * @event error
  * @event end
  */
-class Response extends EventEmitter  implements ReadableStreamInterface
+class Response extends EventEmitter implements ReadableStreamInterface
 {
-
     private $stream;
     private $protocol;
     private $version;
@@ -166,7 +165,7 @@ class Response extends EventEmitter  implements ReadableStreamInterface
         $this->stream->resume();
     }
 
-    public function pipe(WritableStreamInterface $dest, array $options = [])
+    public function pipe(WritableStreamInterface $dest, array $options = array())
     {
         Util::pipe($this, $dest, $options);
 
