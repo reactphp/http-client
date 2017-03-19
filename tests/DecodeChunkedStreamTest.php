@@ -73,6 +73,9 @@ class DecodeChunkedStreamTest extends TestCase
             ],
             'end-chunk-zero-check-3' => [
                 ["00004\r\nWiki\r\n005\r\npedia\r\ne\r\n in\r\n\r\nchunks.\r\n0000\r\n\r\n"]
+            ],
+            'uppercase-chunk' => [
+                ["4\r\nWiki\r\n5\r\npedia\r\nE\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"],
             ]
         ];
     }

@@ -117,7 +117,7 @@ class ChunkedStreamDecoder implements ReadableStreamInterface
                     $lengthChunk = "0";
                 }
             }
-            if (dechex(hexdec($lengthChunk)) !== $lengthChunk) {
+            if (dechex(hexdec($lengthChunk)) !== strtolower($lengthChunk)) {
                 $this->emit('error', [
                     new Exception('Unable to validate "' . $lengthChunk . '" as chunk length header'),
                 ]);
