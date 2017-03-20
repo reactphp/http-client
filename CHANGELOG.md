@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.17 (2017-03-20)
+
+* Improvement: Add PHPUnit to require-dev #75 @jsor
+* Fix: Fix chunk header to be case-insensitive and allow leading zeros for end chunk #77 @mdrost 
+
 ## 0.4.16 (2017-03-01)
 
 * Fix: Trim leading zeros from chunk size #73 @maciejmrozinski 
