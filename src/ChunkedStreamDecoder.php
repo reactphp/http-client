@@ -87,14 +87,6 @@ class ChunkedStreamDecoder implements ReadableStreamInterface
         }
 
         if ($this->nextChunkIsLength) {
-            if (substr($this->buffer, 0, 3) === "0\r\n") {
-                // We've reached the end of the stream
-                $this->reachedEnd = true;
-                $this->emit('end');
-                $this->close();
-                return false;
-            }
-
             $crlfPosition = strpos($this->buffer, static::CRLF);
             if ($crlfPosition === false && strlen($this->buffer) > 1024) {
                 $this->emit('error', [
@@ -106,7 +98,6 @@ class ChunkedStreamDecoder implements ReadableStreamInterface
             if ($crlfPosition === false) {
                 return false; // Chunk header hasn't completely come in yet
             }
-            $this->nextChunkIsLength = false;
             $lengthChunk = substr($this->buffer, 0, $crlfPosition);
             if (strpos($lengthChunk, ';') !== false) {
                 list($lengthChunk) = explode(';', $lengthChunk, 2);
@@ -114,10 +105,15 @@ class ChunkedStreamDecoder implements ReadableStreamInterface
             if ($lengthChunk !== '') {
                 $lengthChunk = ltrim($lengthChunk, "0");
                 if ($lengthChunk === '') {
-                    $lengthChunk = "0";
+                    // We've reached the end of the stream
+                    $this->reachedEnd = true;
+                    $this->emit('end');
+                    $this->close();
+                    return false;
                 }
             }
-            if (dechex(hexdec($lengthChunk)) !== $lengthChunk) {
+            $this->nextChunkIsLength = false;
+            if (dechex(hexdec($lengthChunk)) !== strtolower($lengthChunk)) {
                 $this->emit('error', [
                     new Exception('Unable to validate "' . $lengthChunk . '" as chunk length header'),
                 ]);

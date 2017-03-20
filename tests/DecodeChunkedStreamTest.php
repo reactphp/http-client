@@ -73,6 +73,9 @@ class DecodeChunkedStreamTest extends TestCase
             ],
             'end-chunk-zero-check-3' => [
                 ["00004\r\nWiki\r\n005\r\npedia\r\ne\r\n in\r\n\r\nchunks.\r\n0000\r\n\r\n"]
+            ],
+            'uppercase-chunk' => [
+                ["4\r\nWiki\r\n5\r\npedia\r\nE\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"],
             ]
         ];
     }
@@ -130,7 +133,19 @@ class DecodeChunkedStreamTest extends TestCase
         }
     }
 
-    public function testHandleEnd()
+    public function provideZeroChunk()
+    {
+        return [
+            ['1-zero' => "0\r\n\r\n"],
+            ['random-zero' => str_repeat("0", rand(2, 10))."\r\n\r\n"]
+        ];
+    }
+
+    /**
+     * @test
+     * @dataProvider provideZeroChunk
+     */
+    public function testHandleEnd($zeroChunk)
     {
         $ended = false;
         $stream = new ThroughStream();
@@ -142,7 +157,7 @@ class DecodeChunkedStreamTest extends TestCase
             $ended = true;
         });
 
-        $stream->write("4\r\nWiki\r\n0\r\n\r\n");
+        $stream->write("4\r\nWiki\r\n".$zeroChunk);
 
         $this->assertTrue($ended);
     }
@@ -178,7 +193,11 @@ class DecodeChunkedStreamTest extends TestCase
         $this->assertTrue($ended);
     }
 
-    public function testHandleEndEnsureNoError()
+    /**
+     * @test
+     * @dataProvider provideZeroChunk
+     */
+    public function testHandleEndEnsureNoError($zeroChunk)
     {
         $ended = false;
         $stream = new ThroughStream();
@@ -191,7 +210,7 @@ class DecodeChunkedStreamTest extends TestCase
         });
 
         $stream->write("4\r\nWiki\r\n");
-        $stream->write("0\r\n\r\n");
+        $stream->write($zeroChunk);
         $stream->end();
 
         $this->assertTrue($ended);
