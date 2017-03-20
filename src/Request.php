@@ -231,7 +231,7 @@ class Request implements WritableStreamInterface
         $port = $this->requestData->getPort();
 
         return $this->connector
-            ->create($host, $port);
+            ->connect($host . ':' . $port);
     }
 
     public function setResponseFactory($factory)

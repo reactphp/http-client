@@ -6,7 +6,7 @@
     "require": {
         "php": ">=5.4.0",
         "guzzlehttp/psr7": "^1.0",
-        "react/socket-client": "^0.5 || ^0.4 || ^0.3",
+        "react/socket-client": "^0.6",
         "react/dns": "0.4.*",
         "react/event-loop": "0.4.*",
         "react/stream": "0.4.*",

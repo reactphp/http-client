@@ -480,8 +480,8 @@ class RequestTest extends TestCase
 
         $this->connector
             ->expects($this->once())
-            ->method('create')
-            ->with('www.example.com', 80)
+            ->method('connect')
+            ->with('www.example.com:80')
             ->will($this->returnValue($deferred->promise()));
 
         return function () use ($deferred) {
@@ -493,8 +493,8 @@ class RequestTest extends TestCase
     {
         $this->connector
             ->expects($this->once())
-            ->method('create')
-            ->with('www.example.com', 80)
+            ->method('connect')
+            ->with('www.example.com:80')
             ->will($this->returnValue(new RejectedPromise(new \RuntimeException())));
     }
 
