@@ -132,7 +132,13 @@ class Request implements WritableStreamInterface
         $this->buffer .= $data;
 
         if (false !== strpos($this->buffer, "\r\n\r\n")) {
-            list($response, $bodyChunk) = $this->parseResponse($this->buffer);
+            try {
+                list($response, $bodyChunk) = $this->parseResponse($this->buffer);
+            } catch (\InvalidArgumentException $exception) {
+                $this->emit('error', [$exception, $this]);
+
+                return;
+            }
 
             $this->buffer = null;
 
