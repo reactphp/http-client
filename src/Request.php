@@ -178,19 +178,13 @@ class Request implements WritableStreamInterface
 
     public function closeError(\Exception $error)
     {
-        if (self::STATE_END <= $this->state) {
-            return;
-        }
         $this->emit('error', array($error, $this));
+
         $this->close($error);
     }
 
     public function close(\Exception $error = null)
     {
-        if (self::STATE_END <= $this->state) {
-            return;
-        }
-
         $this->state = self::STATE_END;
 
         if ($this->stream) {
