@@ -17,7 +17,7 @@ class RequestTest extends TestCase
 
     public function setUp()
     {
-        $this->stream = $this->getMockBuilder('React\Stream\Stream')
+        $this->stream = $this->getMockBuilder('React\SocketClient\StreamConnection')
             ->disableOriginalConstructor()
             ->getMock();
 

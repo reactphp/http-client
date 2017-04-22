@@ -230,6 +230,10 @@ class Request implements WritableStreamInterface
         $host = $this->requestData->getHost();
         $port = $this->requestData->getPort();
 
+        if ($this->requestData->getScheme() === 'https') {
+            $host = 'tls://' . $host;
+        }
+
         return $this->connector
             ->connect($host . ':' . $port);
     }
