@@ -4,7 +4,7 @@ namespace React\HttpClient;
 
 use Evenement\EventEmitterTrait;
 use GuzzleHttp\Psr7 as gPsr;
-use React\SocketClient\ConnectorInterface;
+use React\Socket\ConnectorInterface;
 use React\Stream\WritableStreamInterface;
 
 /**

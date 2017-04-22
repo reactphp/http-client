@@ -2,7 +2,7 @@
 
 namespace React\HttpClient;
 
-use React\SocketClient\ConnectorInterface;
+use React\Socket\ConnectorInterface;
 
 class Client
 {

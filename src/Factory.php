@@ -4,7 +4,7 @@ namespace React\HttpClient;
 
 use React\EventLoop\LoopInterface;
 use React\Dns\Resolver\Resolver;
-use React\SocketClient\Connector;
+use React\Socket\Connector;
 
 class Factory
 {
