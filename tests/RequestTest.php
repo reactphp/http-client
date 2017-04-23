@@ -5,9 +5,7 @@ namespace React\Tests\HttpClient;
 use React\HttpClient\Request;
 use React\HttpClient\RequestData;
 use React\Stream\Stream;
-use React\Promise\FulfilledPromise;
 use React\Promise\RejectedPromise;
-use React\Promise;
 use React\Promise\Deferred;
 
 class RequestTest extends TestCase
@@ -17,11 +15,11 @@ class RequestTest extends TestCase
 
     public function setUp()
     {
-        $this->stream = $this->getMockBuilder('React\Stream\Stream')
+        $this->stream = $this->getMockBuilder('React\Socket\Connection')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->connector = $this->getMockBuilder('React\SocketClient\ConnectorInterface')
+        $this->connector = $this->getMockBuilder('React\Socket\ConnectorInterface')
             ->getMock();
 
         $this->response = $this->getMockBuilder('React\HttpClient\Response')

@@ -4,7 +4,7 @@ namespace React\HttpClient;
 
 use Evenement\EventEmitterTrait;
 use GuzzleHttp\Psr7 as gPsr;
-use React\SocketClient\ConnectorInterface;
+use React\Socket\ConnectorInterface;
 use React\Stream\WritableStreamInterface;
 
 /**
@@ -229,6 +229,10 @@ class Request implements WritableStreamInterface
     {
         $host = $this->requestData->getHost();
         $port = $this->requestData->getPort();
+
+        if ($this->requestData->getScheme() === 'https') {
+            $host = 'tls://' . $host;
+        }
 
         return $this->connector
             ->connect($host . ':' . $port);
