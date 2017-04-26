@@ -4,7 +4,7 @@ namespace React\HttpClient;
 
 use React\Socket\ConnectorInterface;
 
-class Client
+class Client implements ClientInterface
 {
     private $connector;
 
