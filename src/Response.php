@@ -2,19 +2,18 @@
 
 namespace React\HttpClient;
 
-use Evenement\EventEmitterTrait;
+use Evenement\EventEmitter;
 use React\Stream\ReadableStreamInterface;
 use React\Stream\Util;
 use React\Stream\WritableStreamInterface;
 
 /**
- * @event data ($bodyChunk, Response $thisResponse)
+ * @event data ($bodyChunk)
  * @event error
  * @event end
  */
-class Response implements ReadableStreamInterface
+class Response extends EventEmitter  implements ReadableStreamInterface
 {
-    use EventEmitterTrait;
 
     private $stream;
     private $protocol;
@@ -48,6 +47,7 @@ class Response implements ReadableStreamInterface
         $this->stream->on('data', array($this, 'handleData'));
         $this->stream->on('error', array($this, 'handleError'));
         $this->stream->on('end', array($this, 'handleEnd'));
+        $this->stream->on('close', array($this, 'handleClose'));
     }
 
     public function getProtocol()
@@ -77,26 +77,40 @@ class Response implements ReadableStreamInterface
 
     public function handleData($data)
     {
-        $this->emit('data', array($data, $this));
+        if ($this->readable) {
+            $this->emit('data', array($data));
+        }
     }
 
     public function handleEnd()
     {
+        if (!$this->readable) {
+            return;
+        }
+        $this->emit('end', array());
         $this->close();
     }
 
     public function handleError(\Exception $error)
     {
+        if (!$this->readable) {
+            return;
+        }
         $this->emit('error', array(new \RuntimeException(
             "An error occurred in the underlying stream",
             0,
             $error
-        ), $this));
+        )));
 
-        $this->close($error);
+        $this->close();
     }
 
-    public function close(\Exception $error = null)
+    public function handleClose()
+    {
+        $this->close();
+    }
+
+    public function close()
     {
         if (!$this->readable) {
             return;
@@ -104,7 +118,7 @@ class Response implements ReadableStreamInterface
 
         $this->readable = false;
 
-        $this->emit('end', array($error, $this));
+        $this->emit('close', array());
 
         $this->removeAllListeners();
         $this->stream->close();
