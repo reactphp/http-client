@@ -218,6 +218,28 @@ class RequestTest extends TestCase
         $request->handleError(new \Exception('test'));
     }
 
+    /** @test */
+    public function requestShouldEmitErrorIfGuzzleParseThrowsException()
+    {
+        $requestData = new RequestData('GET', 'http://www.example.com');
+        $request = new Request($this->connector, $requestData);
+
+        $this->successfulConnectionMock();
+
+        $handler = $this->createCallableMock();
+        $handler->expects($this->once())
+            ->method('__invoke')
+            ->with(
+                $this->isInstanceOf('\InvalidArgumentException'),
+                $this->isInstanceOf('React\HttpClient\Request')
+            );
+
+        $request->on('error', $handler);
+
+        $request->writeHead();
+        $request->handleData("\r\n\r\n");
+    }
+
     /**
      * @test
      * @expectedException Exception
