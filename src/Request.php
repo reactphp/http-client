@@ -133,7 +133,11 @@ class Request implements WritableStreamInterface
         $this->buffer .= $data;
 
         if (false !== strpos($this->buffer, "\r\n\r\n")) {
-            list($response, $bodyChunk) = $this->parseResponse($this->buffer);
+            try {
+                list($response, $bodyChunk) = $this->parseResponse($this->buffer);
+            } catch (\InvalidArgumentException $exception) {
+                $this->emit('error', [$exception, $this]);
+            }
 
             $this->buffer = null;
 
@@ -142,6 +146,10 @@ class Request implements WritableStreamInterface
             $this->stream->removeListener('end', array($this, 'handleEnd'));
             $this->stream->removeListener('error', array($this, 'handleError'));
             $this->stream->removeListener('close', array($this, 'handleClose'));
+
+            if (!isset($response)) {
+                return;
+            }
 
             $this->response = $response;
 
