@@ -1,17 +1,12 @@
 <?php
 
-use React\HttpClient\Factory;
+use React\HttpClient\Client;
 use React\HttpClient\Response;
 
 require __DIR__ . '/../vendor/autoload.php';
 
 $loop = React\EventLoop\Factory::create();
-
-$resolverFactory = new React\Dns\Resolver\Factory();
-$resolver = $resolverFactory->create('8.8.8.8', $loop);
-
-$factory = new Factory();
-$client = $factory->create($loop, $resolver);
+$client = new Client($loop);
 
 $request = $client->request('GET', 'https://google.com/');
 
