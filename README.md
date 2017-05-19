@@ -22,6 +22,11 @@ Calling this method finalizes the outgoing request body (which may be empty).
 Data will be buffered until the underlying connection is established, at which
 point buffered data will be sent and all further data will be ignored.
 
+The `Request#close()` method can be used to
+forefully close sending the request.
+Unlike the `end()` method, this method discards any buffers and closes the
+underlying connection.
+
 Request implements WritableStreamInterface, so a Stream can be piped to it.
 Interesting events emitted by Request:
 
@@ -29,18 +34,20 @@ Interesting events emitted by Request:
   parsed. The first argument is a Response instance.
 * `drain`: The outgoing buffer drained and the response is ready to accept more
   data for the next `write()` call.
-* `error`: An error occurred.
-* `end`: The request is finished. If an error occurred, it is passed as first
-  argument. Second and third arguments are the Response and the Request.
+* `error`: An error occurred, an `Exception` is passed as first argument.
+* `close`: The request is closed. If an error occurred, this event will be
+  preceeded by an `error` event.
 
 Response implements ReadableStreamInterface.
 Interesting events emitted by Response:
 
-* `data`: Passes a chunk of the response body as first argument and a Response
-  object itself as second argument. When a response encounters a chunked encoded response it will parse it transparently for the user of `Response` and removing the `Transfer-Encoding` header.
-* `error`: An error occurred.
-* `end`: The response has been fully received. If an error
-  occurred, it is passed as first argument.
+* `data`: Passes a chunk of the response body as first argument.
+  When a response encounters a chunked encoded response it will parse it
+  transparently for the user and removing the `Transfer-Encoding` header.
+* `error`: An error occurred, an `Exception` is passed as first argument.
+* `end`: The response has been fully received.
+* `close`: The response is closed. If an error occured, this event will be
+  preceeded by an `error` event.
 
 ### Example
 

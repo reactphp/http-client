@@ -216,8 +216,7 @@ class RequestTest extends TestCase
         $handler->expects($this->once())
             ->method('__invoke')
             ->with(
-                $this->isInstanceOf('\InvalidArgumentException'),
-                $this->isInstanceOf('React\HttpClient\Request')
+                $this->isInstanceOf('\InvalidArgumentException')
             );
 
         $request->on('error', $handler);

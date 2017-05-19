@@ -29,7 +29,6 @@ class Request implements WritableStreamInterface
     private $stream;
     private $buffer;
     private $responseFactory;
-    private $response;
     private $state = self::STATE_INIT;
     private $ended = false;
 
@@ -127,6 +126,7 @@ class Request implements WritableStreamInterface
         $this->emit('drain');
     }
 
+    /** @internal */
     public function handleData($data)
     {
         $this->buffer .= $data;
@@ -135,7 +135,7 @@ class Request implements WritableStreamInterface
             try {
                 list($response, $bodyChunk) = $this->parseResponse($this->buffer);
             } catch (\InvalidArgumentException $exception) {
-                $this->emit('error', [$exception, $this]);
+                $this->emit('error', array($exception));
             }
 
             $this->buffer = null;
@@ -149,8 +149,6 @@ class Request implements WritableStreamInterface
             if (!isset($response)) {
                 return;
             }
-
-            $this->response = $response;
 
             $response->on('close', function () {
                 $this->close();
@@ -169,12 +167,16 @@ class Request implements WritableStreamInterface
         }
     }
 
+    /** @internal */
     public function handleEnd()
     {
-        $this->handleClose();
+        $this->closeError(new \RuntimeException(
+            "Connection ended before receiving response"
+        ));
     }
 
-    public function handleError($error)
+    /** @internal */
+    public function handleError(\Exception $error)
     {
         $this->closeError(new \RuntimeException(
             "An error occurred in the underlying stream",
@@ -183,13 +185,13 @@ class Request implements WritableStreamInterface
         ));
     }
 
+    /** @internal */
     public function handleClose()
     {
-        $this->closeError(new \RuntimeException(
-            "Connection closed before receiving response"
-        ));
+        $this->close();
     }
 
+    /** @internal */
     public function closeError(\Exception $error)
     {
         if (self::STATE_END <= $this->state) {
@@ -212,7 +214,7 @@ class Request implements WritableStreamInterface
             $this->stream->close();
         }
 
-        $this->emit('close', array());
+        $this->emit('close');
         $this->removeAllListeners();
     }
 

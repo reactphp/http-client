@@ -75,6 +75,7 @@ class Response extends EventEmitter  implements ReadableStreamInterface
         return $this->headers;
     }
 
+    /** @internal */
     public function handleData($data)
     {
         if ($this->readable) {
@@ -82,15 +83,17 @@ class Response extends EventEmitter  implements ReadableStreamInterface
         }
     }
 
+    /** @internal */
     public function handleEnd()
     {
         if (!$this->readable) {
             return;
         }
-        $this->emit('end', array());
+        $this->emit('end');
         $this->close();
     }
 
+    /** @internal */
     public function handleError(\Exception $error)
     {
         if (!$this->readable) {
@@ -105,6 +108,7 @@ class Response extends EventEmitter  implements ReadableStreamInterface
         $this->close();
     }
 
+    /** @internal */
     public function handleClose()
     {
         $this->close();
@@ -117,11 +121,10 @@ class Response extends EventEmitter  implements ReadableStreamInterface
         }
 
         $this->readable = false;
-
-        $this->emit('close', array());
-
-        $this->removeAllListeners();
         $this->stream->close();
+
+        $this->emit('close');
+        $this->removeAllListeners();
     }
 
     public function isReadable()
