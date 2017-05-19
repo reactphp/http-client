@@ -54,35 +54,38 @@ class Request implements WritableStreamInterface
         $stateRef = &$this->state;
         $pendingWrites = &$this->pendingWrites;
 
-        $this
-            ->connect()
-            ->done(
-                function (ConnectionInterface $stream) use ($requestData, &$streamRef, &$stateRef, &$pendingWrites) {
-                    $streamRef = $stream;
+        $promise = $this->connect();
+        $promise->done(
+            function (ConnectionInterface $stream) use ($requestData, &$streamRef, &$stateRef, &$pendingWrites) {
+                $streamRef = $stream;
 
-                    $stream->on('drain', array($this, 'handleDrain'));
-                    $stream->on('data', array($this, 'handleData'));
-                    $stream->on('end', array($this, 'handleEnd'));
-                    $stream->on('error', array($this, 'handleError'));
-                    $stream->on('close', array($this, 'handleClose'));
+                $stream->on('drain', array($this, 'handleDrain'));
+                $stream->on('data', array($this, 'handleData'));
+                $stream->on('end', array($this, 'handleEnd'));
+                $stream->on('error', array($this, 'handleError'));
+                $stream->on('close', array($this, 'handleClose'));
 
-                    $headers = (string) $requestData;
+                $headers = (string) $requestData;
 
-                    $more = $stream->write($headers . $pendingWrites);
+                $more = $stream->write($headers . $pendingWrites);
 
-                    $stateRef = Request::STATE_HEAD_WRITTEN;
+                $stateRef = Request::STATE_HEAD_WRITTEN;
 
-                    // clear pending writes if non-empty
-                    if ($pendingWrites !== '') {
-                        $pendingWrites = '';
+                // clear pending writes if non-empty
+                if ($pendingWrites !== '') {
+                    $pendingWrites = '';
 
-                        if ($more) {
-                            $this->emit('drain');
-                        }
+                    if ($more) {
+                        $this->emit('drain');
                     }
-                },
-                array($this, 'handleError')
-            );
+                }
+            },
+            array($this, 'handleError')
+        );
+
+        $this->on('close', function() use ($promise) {
+            $promise->cancel();
+        });
     }
 
     public function write($data)

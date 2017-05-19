@@ -25,7 +25,8 @@ point buffered data will be sent and all further data will be ignored.
 The `Request#close()` method can be used to
 forefully close sending the request.
 Unlike the `end()` method, this method discards any buffers and closes the
-underlying connection.
+underlying connection if it is already established or cancels the pending
+connection attempt otherwise.
 
 Request implements WritableStreamInterface, so a Stream can be piped to it.
 Interesting events emitted by Request:
