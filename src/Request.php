@@ -31,6 +31,7 @@ class Request implements WritableStreamInterface
     private $responseFactory;
     private $response;
     private $state = self::STATE_INIT;
+    private $ended = false;
 
     private $pendingWrites = '';
 
@@ -42,7 +43,7 @@ class Request implements WritableStreamInterface
 
     public function isWritable()
     {
-        return self::STATE_END > $this->state;
+        return self::STATE_END > $this->state && !$this->ended;
     }
 
     private function writeHead()
@@ -107,8 +108,8 @@ class Request implements WritableStreamInterface
 
     public function end($data = null)
     {
-        if (null !== $data && !is_scalar($data)) {
-            throw new \InvalidArgumentException('$data must be null or scalar');
+        if (!$this->isWritable()) {
+            return;
         }
 
         if (null !== $data) {
@@ -116,6 +117,8 @@ class Request implements WritableStreamInterface
         } else if (self::STATE_WRITING_HEAD > $this->state) {
             $this->writeHead();
         }
+
+        $this->ended = true;
     }
 
     /** @internal */

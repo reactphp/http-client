@@ -6,9 +6,21 @@ Basic HTTP/1.0 client.
 
 ## Basic usage
 
-Requests are prepared using the ``Client#request()`` method. Body can be
-sent with ``Request#write()``. ``Request#end()`` finishes sending the request
-(or sends it at all if no body was written).
+Requests are prepared using the ``Client#request()`` method.
+
+The `Request#write(string $data)` method can be used to
+write data to the request body.
+Data will be buffered until the underlying connection is established, at which
+point buffered data will be sent and all further data will be passed to the
+underlying connection immediately.
+
+The `Request#end(?string $data = null)` method can be used to
+finish sending the request.
+You may optionally pass a last request body data chunk that will be sent just
+like a `write()` call.
+Calling this method finalizes the outgoing request body (which may be empty).
+Data will be buffered until the underlying connection is established, at which
+point buffered data will be sent and all further data will be ignored.
 
 Request implements WritableStreamInterface, so a Stream can be piped to it.
 Interesting events emitted by Request:

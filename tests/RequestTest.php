@@ -7,6 +7,7 @@ use React\HttpClient\RequestData;
 use React\Stream\Stream;
 use React\Promise\RejectedPromise;
 use React\Promise\Deferred;
+use React\Promise\Promise;
 
 class RequestTest extends TestCase
 {
@@ -442,15 +443,36 @@ class RequestTest extends TestCase
 
     /**
      * @test
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage $data must be null or scalar
      */
-    public function endShouldOnlyAcceptScalars()
+    public function writeShouldStartConnecting()
     {
         $requestData = new RequestData('POST', 'http://www.example.com');
         $request = new Request($this->connector, $requestData);
 
-        $request->end(array());
+        $this->connector->expects($this->once())
+                        ->method('connect')
+                        ->with('www.example.com:80')
+                        ->willReturn(new Promise(function () { }));
+
+        $request->write('test');
+    }
+
+    /**
+     * @test
+     */
+    public function endShouldStartConnectingAndChangeStreamIntoNonWritableMode()
+    {
+        $requestData = new RequestData('POST', 'http://www.example.com');
+        $request = new Request($this->connector, $requestData);
+
+        $this->connector->expects($this->once())
+                        ->method('connect')
+                        ->with('www.example.com:80')
+                        ->willReturn(new Promise(function () { }));
+
+        $request->end();
+
+        $this->assertFalse($request->isWritable());
     }
 
     /**
@@ -477,6 +499,21 @@ class RequestTest extends TestCase
 
         $this->assertFalse($request->isWritable());
         $this->assertFalse($request->write('nope'));
+    }
+
+    /**
+     * @test
+     */
+    public function endAfterCloseIsNoOp()
+    {
+        $requestData = new RequestData('POST', 'http://www.example.com');
+        $request = new Request($this->connector, $requestData);
+
+        $this->connector->expects($this->never())
+                        ->method('connect');
+
+        $request->close();
+        $request->end();
     }
 
     /** @test */
