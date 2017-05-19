@@ -516,6 +516,32 @@ class RequestTest extends TestCase
         $request->end();
     }
 
+    /**
+     * @test
+     */
+    public function closeShouldCancelPendingConnectionAttempt()
+    {
+        $requestData = new RequestData('POST', 'http://www.example.com');
+        $request = new Request($this->connector, $requestData);
+
+        $promise = new Promise(function () {}, function () {
+            throw new \RuntimeException();
+        });
+
+        $this->connector->expects($this->once())
+            ->method('connect')
+            ->with('www.example.com:80')
+            ->willReturn($promise);
+
+        $request->end();
+
+        $request->on('error', $this->expectCallableNever());
+        $request->on('close', $this->expectCallableOnce());
+
+        $request->close();
+        $request->close();
+    }
+
     /** @test */
     public function requestShouldRelayErrorEventsFromResponse()
     {
