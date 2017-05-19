@@ -5,6 +5,7 @@ namespace React\Tests\HttpClient;
 use React\HttpClient\Request;
 use React\HttpClient\RequestData;
 use React\Stream\Stream;
+use React\Stream\DuplexResourceStream;
 use React\Promise\RejectedPromise;
 use React\Promise\Deferred;
 use React\Promise\Promise;
@@ -428,7 +429,7 @@ class RequestTest extends TestCase
         $request->setResponseFactory($factory);
 
         $stream = fopen('php://memory', 'r+');
-        $stream = new Stream($stream, $loop);
+        $stream = class_exists('React\Stream\DuplexResourceStream') ? new DuplexResourceStream($stream, $loop) : new Stream($stream, $loop);
 
         $stream->pipe($request);
         $stream->emit('data', array('some'));
