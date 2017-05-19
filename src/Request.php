@@ -6,9 +6,9 @@ use Evenement\EventEmitterTrait;
 use GuzzleHttp\Psr7 as gPsr;
 use React\Socket\ConnectorInterface;
 use React\Stream\WritableStreamInterface;
+use React\Socket\ConnectionInterface;
 
 /**
- * @event headers-written
  * @event response
  * @event drain
  * @event error
@@ -32,7 +32,7 @@ class Request implements WritableStreamInterface
     private $response;
     private $state = self::STATE_INIT;
 
-    private $pendingWrites = array();
+    private $pendingWrites = '';
 
     public function __construct(ConnectorInterface $connector, RequestData $requestData)
     {
@@ -45,22 +45,19 @@ class Request implements WritableStreamInterface
         return self::STATE_END > $this->state;
     }
 
-    public function writeHead()
+    private function writeHead()
     {
-        if (self::STATE_WRITING_HEAD <= $this->state) {
-            throw new \LogicException('Headers already written');
-        }
-
         $this->state = self::STATE_WRITING_HEAD;
 
         $requestData = $this->requestData;
         $streamRef = &$this->stream;
         $stateRef = &$this->state;
+        $pendingWrites = &$this->pendingWrites;
 
         $this
             ->connect()
             ->done(
-                function ($stream) use ($requestData, &$streamRef, &$stateRef) {
+                function (ConnectionInterface $stream) use ($requestData, &$streamRef, &$stateRef, &$pendingWrites) {
                     $streamRef = $stream;
 
                     $stream->on('drain', array($this, 'handleDrain'));
@@ -71,11 +68,18 @@ class Request implements WritableStreamInterface
 
                     $headers = (string) $requestData;
 
-                    $stream->write($headers);
+                    $more = $stream->write($headers . $pendingWrites);
 
                     $stateRef = Request::STATE_HEAD_WRITTEN;
 
-                    $this->emit('headers-written', array($this));
+                    // clear pending writes if non-empty
+                    if ($pendingWrites !== '') {
+                        $pendingWrites = '';
+
+                        if ($more) {
+                            $this->emit('drain');
+                        }
+                    }
                 },
                 array($this, 'handleError')
             );
@@ -84,25 +88,16 @@ class Request implements WritableStreamInterface
     public function write($data)
     {
         if (!$this->isWritable()) {
-            return;
+            return false;
         }
 
+        // write directly to connection stream if already available
         if (self::STATE_HEAD_WRITTEN <= $this->state) {
             return $this->stream->write($data);
         }
 
-        if (!count($this->pendingWrites)) {
-            $this->on('headers-written', function ($that) {
-                foreach ($that->pendingWrites as $pw) {
-                    $that->write($pw);
-                }
-                $that->pendingWrites = array();
-                $that->emit('drain', array($that));
-            });
-        }
-
-        $this->pendingWrites[] = $data;
-
+        // otherwise buffer and try to establish connection
+        $this->pendingWrites .= $data;
         if (self::STATE_WRITING_HEAD > $this->state) {
             $this->writeHead();
         }
@@ -123,9 +118,10 @@ class Request implements WritableStreamInterface
         }
     }
 
+    /** @internal */
     public function handleDrain()
     {
-        $this->emit('drain', array($this));
+        $this->emit('drain');
     }
 
     public function handleData($data)
@@ -207,6 +203,7 @@ class Request implements WritableStreamInterface
         }
 
         $this->state = self::STATE_END;
+        $this->pendingWrites = '';
 
         if ($this->stream) {
             $this->stream->close();

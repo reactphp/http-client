@@ -221,7 +221,7 @@ class RequestTest extends TestCase
 
         $request->on('error', $handler);
 
-        $request->writeHead();
+        $request->end();
         $request->handleData("\r\n\r\n");
     }
 
@@ -253,13 +253,9 @@ class RequestTest extends TestCase
         $this->successfulConnectionMock();
 
         $this->stream
-            ->expects($this->at(5))
+            ->expects($this->once())
             ->method('write')
-            ->with($this->matchesRegularExpression("#^POST / HTTP/1\.0\r\nHost: www.example.com\r\nUser-Agent:.*\r\n\r\n$#"));
-        $this->stream
-            ->expects($this->at(6))
-            ->method('write')
-            ->with($this->identicalTo("some post data"));
+            ->with($this->matchesRegularExpression("#^POST / HTTP/1\.0\r\nHost: www.example.com\r\nUser-Agent:.*\r\n\r\nsome post data$#"));
 
         $factory = $this->createCallableMock();
         $factory->expects($this->once())
@@ -285,17 +281,13 @@ class RequestTest extends TestCase
         $this->stream
             ->expects($this->at(5))
             ->method('write')
-            ->with($this->matchesRegularExpression("#^POST / HTTP/1\.0\r\nHost: www.example.com\r\nUser-Agent:.*\r\n\r\n$#"));
+            ->with($this->matchesRegularExpression("#^POST / HTTP/1\.0\r\nHost: www.example.com\r\nUser-Agent:.*\r\n\r\nsome$#"));
         $this->stream
             ->expects($this->at(6))
             ->method('write')
-            ->with($this->identicalTo("some"));
-        $this->stream
-            ->expects($this->at(7))
-            ->method('write')
             ->with($this->identicalTo("post"));
         $this->stream
-            ->expects($this->at(8))
+            ->expects($this->at(7))
             ->method('write')
             ->with($this->identicalTo("data"));
 
@@ -326,17 +318,10 @@ class RequestTest extends TestCase
         $this->stream
             ->expects($this->at(5))
             ->method('write')
-            ->with($this->matchesRegularExpression("#^POST / HTTP/1\.0\r\nHost: www.example.com\r\nUser-Agent:.*\r\n\r\n$#"));
+            ->with($this->matchesRegularExpression("#^POST / HTTP/1\.0\r\nHost: www.example.com\r\nUser-Agent:.*\r\n\r\nsomepost$#"))
+            ->willReturn(true);
         $this->stream
             ->expects($this->at(6))
-            ->method('write')
-            ->with($this->identicalTo("some"));
-        $this->stream
-            ->expects($this->at(7))
-            ->method('write')
-            ->with($this->identicalTo("post"));
-        $this->stream
-            ->expects($this->at(8))
             ->method('write')
             ->with($this->identicalTo("data"));
 
@@ -350,12 +335,60 @@ class RequestTest extends TestCase
         $this->assertFalse($request->write("some"));
         $this->assertFalse($request->write("post"));
 
+        $request->on('drain', $this->expectCallableOnce());
         $request->once('drain', function () use ($request) {
             $request->write("data");
             $request->end();
         });
 
         $resolveConnection();
+
+        $request->handleData("HTTP/1.0 200 OK\r\n");
+        $request->handleData("Content-Type: text/plain\r\n");
+        $request->handleData("\r\nbody");
+    }
+
+    /** @test */
+    public function writeWithAPostRequestShouldForwardDrainEventIfFirstChunkExceedsBuffer()
+    {
+        $requestData = new RequestData('POST', 'http://www.example.com');
+        $request = new Request($this->connector, $requestData);
+
+        $this->stream = $this->getMockBuilder('React\Socket\Connection')
+            ->disableOriginalConstructor()
+            ->setMethods(array('write'))
+            ->getMock();
+
+        $resolveConnection = $this->successfulAsyncConnectionMock();
+
+        $this->stream
+            ->expects($this->at(0))
+            ->method('write')
+            ->with($this->matchesRegularExpression("#^POST / HTTP/1\.0\r\nHost: www.example.com\r\nUser-Agent:.*\r\n\r\nsomepost$#"))
+            ->willReturn(false);
+        $this->stream
+            ->expects($this->at(1))
+            ->method('write')
+            ->with($this->identicalTo("data"));
+
+        $factory = $this->createCallableMock();
+        $factory->expects($this->once())
+            ->method('__invoke')
+            ->will($this->returnValue($this->response));
+
+        $request->setResponseFactory($factory);
+
+        $this->assertFalse($request->write("some"));
+        $this->assertFalse($request->write("post"));
+
+        $request->on('drain', $this->expectCallableOnce());
+        $request->once('drain', function () use ($request) {
+            $request->write("data");
+            $request->end();
+        });
+
+        $resolveConnection();
+        $this->stream->emit('drain');
 
         $request->handleData("HTTP/1.0 200 OK\r\n");
         $request->handleData("Content-Type: text/plain\r\n");
@@ -373,17 +406,13 @@ class RequestTest extends TestCase
         $this->stream
             ->expects($this->at(5))
             ->method('write')
-            ->with($this->matchesRegularExpression("#^POST / HTTP/1\.0\r\nHost: www.example.com\r\nUser-Agent:.*\r\n\r\n$#"));
+            ->with($this->matchesRegularExpression("#^POST / HTTP/1\.0\r\nHost: www.example.com\r\nUser-Agent:.*\r\n\r\nsome$#"));
         $this->stream
             ->expects($this->at(6))
             ->method('write')
-            ->with($this->identicalTo("some"));
-        $this->stream
-            ->expects($this->at(7))
-            ->method('write')
             ->with($this->identicalTo("post"));
         $this->stream
-            ->expects($this->at(8))
+            ->expects($this->at(7))
             ->method('write')
             ->with($this->identicalTo("data"));
 
@@ -422,6 +451,32 @@ class RequestTest extends TestCase
         $request = new Request($this->connector, $requestData);
 
         $request->end(array());
+    }
+
+    /**
+     * @test
+     */
+    public function closeShouldEmitCloseEvent()
+    {
+        $requestData = new RequestData('POST', 'http://www.example.com');
+        $request = new Request($this->connector, $requestData);
+
+        $request->on('close', $this->expectCallableOnce());
+        $request->close();
+    }
+
+    /**
+     * @test
+     */
+    public function writeAfterCloseReturnsFalse()
+    {
+        $requestData = new RequestData('POST', 'http://www.example.com');
+        $request = new Request($this->connector, $requestData);
+
+        $request->close();
+
+        $this->assertFalse($request->isWritable());
+        $this->assertFalse($request->write('nope'));
     }
 
     /** @test */
