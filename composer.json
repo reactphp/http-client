@@ -1,6 +1,6 @@
 {
     "name": "react/http-client",
-    "description": "Asynchronous HTTP client library.",
+    "description": "Event-driven, streaming HTTP client for ReactPHP",
     "keywords": ["http"],
     "license": "MIT",
     "require": {

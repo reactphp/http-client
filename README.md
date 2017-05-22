@@ -2,7 +2,15 @@
 
 [![Build Status](https://secure.travis-ci.org/reactphp/http-client.png?branch=master)](http://travis-ci.org/reactphp/http-client) [![Code Climate](https://codeclimate.com/github/reactphp/http-client/badges/gpa.svg)](https://codeclimate.com/github/reactphp/http-client)
 
-Basic HTTP/1.0 client.
+Event-driven, streaming HTTP client for [ReactPHP](http://reactphp.org)
+
+**Table of Contents**
+
+* [Basic usage](#basic-usage)
+  * [Example](#example)
+* [Install](#install)
+* [Tests](#tests)
+* [License](#license)
 
 ## Basic usage
 
@@ -70,11 +78,18 @@ $loop->run();
 
 See also the [examples](examples).
 
-## TODO
+## Install
 
-* gzip content encoding
-* keep-alive connections
-* following redirections
+The recommended way to install this library is [through Composer](http://getcomposer.org).
+[New to Composer?](http://getcomposer.org/doc/00-intro.md)
+
+This will install the latest supported version:
+
+```bash
+$ composer require react/http-client:^0.5
+```
+
+More details about version upgrades can be found in the [CHANGELOG](CHANGELOG.md).
 
 ## Tests
 
@@ -90,3 +105,7 @@ To run the test suite, go to the project root and run:
 ```bash
 $ php vendor/bin/phpunit
 ```
+
+## License
+
+MIT, see [LICENSE file](LICENSE).

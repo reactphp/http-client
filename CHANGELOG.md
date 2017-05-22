@@ -1,5 +1,40 @@
 # Changelog
 
+## 0.5.0 (2017-05-22)
+
+*   Feature / BC break: Replace `Factory` with simple `Client` constructor
+    (#85 by @clue)
+
+    The `Client` now accepts a required `LoopInterface` and an optional
+    `ConnectorInterface`. It will now create a default `Connector` if none
+    has been given.
+
+    ```php
+    // old
+    $dnsResolverFactory = new React\Dns\Resolver\Factory();
+    $dnsResolver = $dnsResolverFactory->createCached('8.8.8.8', $loop);
+    $factory = new React\HttpClient\Factory();
+    $client = $factory->create($loop, $dnsResolver);
+
+    // new
+    $client = new React\HttpClient\Client($loop);
+    ```
+
+*   Feature: `Request::close()` now cancels pending connection attempt
+    (#91 by @clue)
+
+*   Feature / BC break: Replace deprecated SocketClient with new Socket component
+    (#74, #84 and #88 by @clue)
+
+*   Feature / BC break: Consistent stream semantics and forward compatibility with upcoming Stream v1.0
+    (#90 by @clue)
+
+*   Feature: Forward compatibility with upcoming EventLoop v1.0 and v0.5
+    (#89 by @clue)
+
+*   Fix: Catch Guzzle parser exception
+    (#82 by @djagya)
+
 ## 0.4.17 (2017-03-20)
 
 * Improvement: Add PHPUnit to require-dev #75 @jsor
