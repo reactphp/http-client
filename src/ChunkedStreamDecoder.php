@@ -184,6 +184,12 @@ class ChunkedStreamDecoder implements ReadableStreamInterface
     }
 
     /** @internal */
+    public function end()
+    {
+        return $this->close();
+    }
+
+    /** @internal */
     public function handleEnd()
     {
         $this->handleData('');

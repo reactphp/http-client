@@ -129,5 +129,28 @@ class ResponseTest extends TestCase
             $response->getHeaders()
         );
     }
+
+    /** @test */
+    public function chunkedEncodingResponseEnd()
+    {
+        $exception = new \Exception('FUBAR');
+        $response = new Response(
+            $this->stream,
+            'http',
+            '1.0',
+            '200',
+            'ok',
+            [
+                'content-type' => 'text/plain',
+                'transfer-encoding' => 'chunked',
+            ]
+        );
+
+        $this->stream
+            ->expects($this->once())
+            ->method('close');
+
+        $response->close($exception);
+    }
 }
 
