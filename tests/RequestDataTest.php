@@ -20,6 +20,58 @@ class RequestDataTest extends TestCase
     }
 
     /** @test */
+    public function toStringReturnsHTTPRequestMessageWithEmptyQueryString()
+    {
+        $requestData = new RequestData('GET', 'http://www.example.com/path?hello=world');
+
+        $expected = "GET /path?hello=world HTTP/1.0\r\n" .
+            "Host: www.example.com\r\n" .
+            "User-Agent: React/alpha\r\n" .
+            "\r\n";
+
+        $this->assertSame($expected, $requestData->__toString());
+    }
+
+    /** @test */
+    public function toStringReturnsHTTPRequestMessageWithZeroQueryStringAndRootPath()
+    {
+        $requestData = new RequestData('GET', 'http://www.example.com?0');
+
+        $expected = "GET /?0 HTTP/1.0\r\n" .
+            "Host: www.example.com\r\n" .
+            "User-Agent: React/alpha\r\n" .
+            "\r\n";
+
+        $this->assertSame($expected, $requestData->__toString());
+    }
+
+    /** @test */
+    public function toStringReturnsHTTPRequestMessageWithOptionsAbsoluteRequestForm()
+    {
+        $requestData = new RequestData('OPTIONS', 'http://www.example.com/');
+
+        $expected = "OPTIONS / HTTP/1.0\r\n" .
+            "Host: www.example.com\r\n" .
+            "User-Agent: React/alpha\r\n" .
+            "\r\n";
+
+        $this->assertSame($expected, $requestData->__toString());
+    }
+
+    /** @test */
+    public function toStringReturnsHTTPRequestMessageWithOptionsAsteriskRequestForm()
+    {
+        $requestData = new RequestData('OPTIONS', 'http://www.example.com');
+
+        $expected = "OPTIONS * HTTP/1.0\r\n" .
+            "Host: www.example.com\r\n" .
+            "User-Agent: React/alpha\r\n" .
+            "\r\n";
+
+        $this->assertSame($expected, $requestData->__toString());
+    }
+
+    /** @test */
     public function toStringReturnsHTTPRequestMessageWithProtocolVersion()
     {
         $requestData = new RequestData('GET', 'http://www.example.com');

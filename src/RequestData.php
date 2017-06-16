@@ -56,10 +56,18 @@ class RequestData
 
     public function getPath()
     {
-        $path = parse_url($this->url, PHP_URL_PATH) ?: '/';
+        $path = parse_url($this->url, PHP_URL_PATH);
         $queryString = parse_url($this->url, PHP_URL_QUERY);
 
-        return $path.($queryString ? "?$queryString" : '');
+        // assume "/" path by default, but allow "OPTIONS *"
+        if ($path === null) {
+            $path = ($this->method === 'OPTIONS' && $queryString === null) ? '*': '/';
+        }
+        if ($queryString !== null) {
+            $path .= '?' . $queryString;
+        }
+
+        return $path;
     }
 
     public function setProtocolVersion($version)
