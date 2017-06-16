@@ -4,6 +4,7 @@ namespace React\HttpClient;
 
 use Evenement\EventEmitterTrait;
 use GuzzleHttp\Psr7 as gPsr;
+use React\Promise;
 use React\Socket\ConnectorInterface;
 use React\Stream\WritableStreamInterface;
 use React\Socket\ConnectionInterface;
@@ -80,7 +81,7 @@ class Request implements WritableStreamInterface
                     }
                 }
             },
-            array($this, 'handleError')
+            array($this, 'closeError')
         );
 
         $this->on('close', function() use ($promise) {
@@ -247,10 +248,17 @@ class Request implements WritableStreamInterface
 
     protected function connect()
     {
+        $scheme = $this->requestData->getScheme();
+        if ($scheme !== 'https' && $scheme !== 'http') {
+            return Promise\reject(
+                new \InvalidArgumentException('Invalid request URL given')
+            );
+        }
+
         $host = $this->requestData->getHost();
         $port = $this->requestData->getPort();
 
-        if ($this->requestData->getScheme() === 'https') {
+        if ($scheme === 'https') {
             $host = 'tls://' . $host;
         }
 

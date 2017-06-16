@@ -228,6 +228,52 @@ class RequestTest extends TestCase
 
     /**
      * @test
+     */
+    public function requestShouldEmitErrorIfUrlIsInvalid()
+    {
+        $requestData = new RequestData('GET', 'ftp://www.example.com');
+        $request = new Request($this->connector, $requestData);
+
+        $handler = $this->createCallableMock();
+        $handler->expects($this->once())
+            ->method('__invoke')
+            ->with(
+                $this->isInstanceOf('\InvalidArgumentException')
+            );
+
+        $request->on('error', $handler);
+
+        $this->connector->expects($this->never())
+            ->method('connect');
+
+        $request->end();
+    }
+
+    /**
+     * @test
+     */
+    public function requestShouldEmitErrorIfUrlHasNoScheme()
+    {
+        $requestData = new RequestData('GET', 'www.example.com');
+        $request = new Request($this->connector, $requestData);
+
+        $handler = $this->createCallableMock();
+        $handler->expects($this->once())
+            ->method('__invoke')
+            ->with(
+                $this->isInstanceOf('\InvalidArgumentException')
+            );
+
+        $request->on('error', $handler);
+
+        $this->connector->expects($this->never())
+            ->method('connect');
+
+        $request->end();
+    }
+
+    /**
+     * @test
      * @expectedException Exception
      * @expectedExceptionMessage something failed
      */
