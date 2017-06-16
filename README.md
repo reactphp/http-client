@@ -44,8 +44,11 @@ Interesting events emitted by Request:
 * `drain`: The outgoing buffer drained and the response is ready to accept more
   data for the next `write()` call.
 * `error`: An error occurred, an `Exception` is passed as first argument.
+  If the response emits an `error` event, this will also be emitted here.
 * `close`: The request is closed. If an error occurred, this event will be
   preceeded by an `error` event.
+  For a successful response, this will be emitted only once the response emits
+  the `close` event.
 
 Response implements ReadableStreamInterface.
 Interesting events emitted by Response:
@@ -54,9 +57,11 @@ Interesting events emitted by Response:
   When a response encounters a chunked encoded response it will parse it
   transparently for the user and removing the `Transfer-Encoding` header.
 * `error`: An error occurred, an `Exception` is passed as first argument.
+  This will also be forwarded to the request and emit an `error` event there.
 * `end`: The response has been fully received.
 * `close`: The response is closed. If an error occured, this event will be
   preceeded by an `error` event.
+  This will also be forwarded to the request and emit a `close` event there.
 
 ### Example
 
@@ -68,9 +73,15 @@ $client = new React\HttpClient\Client($loop);
 
 $request = $client->request('GET', 'https://github.com/');
 $request->on('response', function ($response) {
-    $response->on('data', function ($data, $response) {
-        // ...
+    $response->on('data', function ($chunk) {
+        echo $chunk;
     });
+    $response->on('end', function() {
+        echo 'DONE';
+    });
+});
+$request->on('error', function (\Exception $e) {
+    echo $e;
 });
 $request->end();
 $loop->run();
