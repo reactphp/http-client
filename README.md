@@ -97,7 +97,7 @@ The recommended way to install this library is [through Composer](http://getcomp
 This will install the latest supported version:
 
 ```bash
-$ composer require react/http-client:^0.5
+$ composer require react/http-client:^0.5.1
 ```
 
 More details about version upgrades can be found in the [CHANGELOG](CHANGELOG.md).

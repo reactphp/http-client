@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.5.1 (2017-06-18)
+
+*   Feature: Emit `error` event if request URL is invalid
+    (#99 by @clue)
+
+*   Feature: Support OPTIONS method with asterisk-form (`OPTIONS * HTTP/1.1`)
+    (#98 by @clue)
+
+*   Improve documentation for event semantics
+    (#97 by @clue)
+
 ## 0.5.0 (2017-05-22)
 
 *   Feature / BC break: Replace `Factory` with simple `Client` constructor
