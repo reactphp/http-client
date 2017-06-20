@@ -73,8 +73,10 @@ class RequestData
 
         $data = '';
         $data .= "{$this->method} {$this->getPath()} HTTP/{$this->protocolVersion}\r\n";
-        foreach ($headers as $name => $value) {
-            $data .= "$name: $value\r\n";
+        foreach ($headers as $name => $values) {
+            foreach ((array)$values as $value) {
+                $data .= "$name: $value\r\n";
+            }
         }
         $data .= "\r\n";
 
