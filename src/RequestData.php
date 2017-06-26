@@ -23,15 +23,24 @@ class RequestData
         $connectionHeaders = ('1.1' === $this->protocolVersion) ? array('Connection' => 'close') : array();
         $authHeaders = $this->getAuthHeaders();
 
-        return array_merge(
+        $defaults = array_merge(
             array(
                 'Host'          => $this->getHost().$port,
                 'User-Agent'    => 'React/alpha',
             ),
             $connectionHeaders,
-            $authHeaders,
-            $headers
+            $authHeaders
         );
+
+        // remove all defaults that already exist in $headers
+        $lower = array_change_key_case($headers, CASE_LOWER);
+        foreach ($defaults as $key => $_) {
+            if (isset($lower[strtolower($key)])) {
+                unset($defaults[$key]);
+            }
+        }
+
+        return array_merge($defaults, $headers);
     }
 
     public function getScheme()
