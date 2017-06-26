@@ -14,7 +14,16 @@ Event-driven, streaming HTTP client for [ReactPHP](http://reactphp.org)
 
 ## Basic usage
 
-Requests are prepared using the ``Client#request()`` method.
+The `request(string $method, string $uri, array $headers = array(), string $version = '1.0'): Request`
+method can be used to prepare new Request objects.
+
+The optional `$headers` parameter can be used to pass additional request
+headers.
+You can use an associative array (key=value) or an array for each header value
+(key=values).
+The Request will automatically include an appropriate `Host`,
+`User-Agent: react/alpha` and `Connection: close` header if applicable.
+You can pass custom header values or use an empty array to omit any of these.
 
 The `Request#write(string $data)` method can be used to
 write data to the request body.

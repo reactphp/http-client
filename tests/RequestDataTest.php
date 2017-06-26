@@ -87,6 +87,26 @@ class RequestDataTest extends TestCase
     }
 
     /** @test */
+    public function toStringReturnsHTTPRequestMessageWithHeaders()
+    {
+        $requestData = new RequestData('GET', 'http://www.example.com', array(
+            'User-Agent' => array(),
+            'Via' => array(
+                'first',
+                'second'
+            )
+        ));
+
+        $expected = "GET / HTTP/1.0\r\n" .
+            "Host: www.example.com\r\n" .
+            "Via: first\r\n" .
+            "Via: second\r\n" .
+            "\r\n";
+
+        $this->assertSame($expected, $requestData->__toString());
+    }
+
+    /** @test */
     public function toStringReturnsHTTPRequestMessageWithProtocolVersionThroughConstructor()
     {
         $requestData = new RequestData('GET', 'http://www.example.com', [], '1.1');
