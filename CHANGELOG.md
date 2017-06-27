@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5.2 (2017-06-27)
+
+*   Feature: Support passing arrays for request header values
+    (#100 by @clue)
+
+*   Fix: Fix merging default headers if overwritten with custom case headers
+    (#101 by @clue)
+
 ## 0.5.1 (2017-06-18)
 
 *   Feature: Emit `error` event if request URL is invalid
