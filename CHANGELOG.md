@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.2 (2017-08-16)
+
+*   Improvement: Target evenement 3.0 a long side 2.0
+    (#106 by @WyriHaximus)
+
 ## 0.5.2 (2017-06-27)
 
 *   Feature: Support passing arrays for request header values
