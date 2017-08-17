@@ -249,7 +249,7 @@ class Request implements WritableStreamInterface
     protected function connect()
     {
         $scheme = $this->requestData->getScheme();
-        if ($scheme !== 'https' && $scheme !== 'http') {
+        if ($scheme !== 'https' && $scheme !== 'http' && $scheme !== 'ws' && $scheme !== 'wss') {
             return Promise\reject(
                 new \InvalidArgumentException('Invalid request URL given')
             );
@@ -258,7 +258,7 @@ class Request implements WritableStreamInterface
         $host = $this->requestData->getHost();
         $port = $this->requestData->getPort();
 
-        if ($scheme === 'https') {
+        if ($scheme === 'https' || $scheme === 'wss') {
             $host = 'tls://' . $host;
         }
 
