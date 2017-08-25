@@ -1,9 +1,29 @@
 # Changelog
 
-## 0.5.2 (2017-08-16)
+## 0.5.4 (2017-08-25)
 
-*   Improvement: Target evenement 3.0 a long side 2.0
+*   Feature: Update Socket dependency to support hosts file on all platforms
+    (#108 by @clue)
+
+    This means that HTTP requests to hosts such as `localhost` will now work as
+    expected across all platforms with no changes required:
+
+    ```
+    $client = new Client($loop);
+    $request = $client->request('GET', 'http://localhost/');
+    $request->on('response', function (Response $response) {
+        // …
+    });
+    $request->end();
+    ```
+
+## 0.5.3 (2017-08-16)
+
+*   Feature: Target evenement 3.0 a long side 2.0
     (#106 by @WyriHaximus)
+
+*   Improve test suite by locking Travis distro so new defaults will not break the build
+    (#211 by @clue)
 
 ## 0.5.2 (2017-06-27)
 
