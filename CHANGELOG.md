@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.5 (2017-09-10)
+
+*   Fix: Update Socket component to work around sending secure HTTPS requests with PHP < 7.1.4
+    (#109 by @clue)
+
 ## 0.5.4 (2017-08-25)
 
 *   Feature: Update Socket dependency to support hosts file on all platforms
@@ -8,7 +13,7 @@
     This means that HTTP requests to hosts such as `localhost` will now work as
     expected across all platforms with no changes required:
 
-    ```
+    ```php
     $client = new Client($loop);
     $request = $client->request('GET', 'http://localhost/');
     $request->on('response', function (Response $response) {
@@ -23,7 +28,7 @@
     (#106 by @WyriHaximus)
 
 *   Improve test suite by locking Travis distro so new defaults will not break the build
-    (#211 by @clue)
+    (#105 by @clue)
 
 ## 0.5.2 (2017-06-27)
 

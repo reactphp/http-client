@@ -100,13 +100,13 @@ See also the [examples](examples).
 
 ## Install
 
-The recommended way to install this library is [through Composer](http://getcomposer.org).
-[New to Composer?](http://getcomposer.org/doc/00-intro.md)
+The recommended way to install this library is [through Composer](https://getcomposer.org).
+[New to Composer?](https://getcomposer.org/doc/00-intro.md)
 
 This will install the latest supported version:
 
 ```bash
-$ composer require react/http-client:^0.5.4
+$ composer require react/http-client:^0.5.5
 ```
 
 See also the [CHANGELOG](CHANGELOG.md) for details about version upgrades.
