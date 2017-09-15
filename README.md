@@ -8,6 +8,8 @@ Event-driven, streaming HTTP client for [ReactPHP](http://reactphp.org)
 
 * [Basic usage](#basic-usage)
   * [Example](#example)
+* [Advanced usage](#advanced-usage)
+  * [Unix domain sockets](#unix-domain-sockets)
 * [Install](#install)
 * [Tests](#tests)
 * [License](#license)
@@ -97,6 +99,31 @@ $loop->run();
 ```
 
 See also the [examples](examples).
+
+## Advanced Usage
+
+### Unix domain sockets
+
+By default, this library supports transport over plaintext TCP/IP and secure
+TLS connections for the `http://` and `https://` URI schemes respectively.
+This library also supports Unix domain sockets (UDS) when explicitly configured.
+
+In order to use a UDS path, you have to explicitly configure the connector to
+override the destination URI so that the hostname given in the request URI will
+no longer be used to establish the connection:
+
+```php
+$connector = new FixedUriConnector(
+    'unix:///var/run/docker.sock',
+    new UnixConnector($loop)
+);
+
+$client = new Client($loop, $connector);
+
+$request = $client->request('GET', 'http://localhost/info');
+```
+
+See also [example #11](examples/11-unix-domain-sockets.php).
 
 ## Install
 
