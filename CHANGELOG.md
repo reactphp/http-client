@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.6 (2017-09-17)
+
+*   Feature: Update Socket component to support HTTP over Unix domain sockets (UDS)
+    (#110 by @clue)
+
 ## 0.5.5 (2017-09-10)
 
 *   Fix: Update Socket component to work around sending secure HTTPS requests with PHP < 7.1.4
