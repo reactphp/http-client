@@ -1,8 +1,9 @@
-# HttpClient Component
+# HttpClient
 
-[![Build Status](https://secure.travis-ci.org/reactphp/http-client.png?branch=master)](http://travis-ci.org/reactphp/http-client) [![Code Climate](https://codeclimate.com/github/reactphp/http-client/badges/gpa.svg)](https://codeclimate.com/github/reactphp/http-client)
+[![Build Status](https://travis-ci.org/reactphp/http-client.svg?branch=master)](https://travis-ci.org/reactphp/http-client)
+[![Code Climate](https://codeclimate.com/github/reactphp/http-client/badges/gpa.svg)](https://codeclimate.com/github/reactphp/http-client)
 
-Event-driven, streaming HTTP client for [ReactPHP](http://reactphp.org)
+Event-driven, streaming HTTP client for [ReactPHP](https://reactphp.org).
 
 **Table of Contents**
 
@@ -165,6 +166,7 @@ If you do not want to run these, they can simply be skipped like this:
 
 ```bash
 $ php vendor/bin/phpunit --exclude-group internet
+```
 
 ## License
 
