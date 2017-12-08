@@ -76,6 +76,13 @@ class DecodeChunkedStreamTest extends TestCase
             ],
             'uppercase-chunk' => [
                 ["4\r\nWiki\r\n5\r\npedia\r\nE\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"],
+            ],
+            'extra-space-in-length-chunk' => [
+                [" 04 \r\nWiki\r\n5\r\npedia\r\nE\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"],
+            ],
+            'only-whitespace-is-final-chunk' => [
+                ["   \r\n\r\n"],
+                ""
             ]
         ];
     }

@@ -103,7 +103,7 @@ class ChunkedStreamDecoder implements ReadableStreamInterface
                 list($lengthChunk) = explode(';', $lengthChunk, 2);
             }
             if ($lengthChunk !== '') {
-                $lengthChunk = ltrim($lengthChunk, "0");
+                $lengthChunk = ltrim(trim($lengthChunk), "0");
                 if ($lengthChunk === '') {
                     // We've reached the end of the stream
                     $this->reachedEnd = true;
