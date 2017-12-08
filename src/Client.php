@@ -6,7 +6,7 @@ use React\EventLoop\LoopInterface;
 use React\Socket\ConnectorInterface;
 use React\Socket\Connector;
 
-class Client
+class Client implements ClientInterface
 {
     private $connector;
 
