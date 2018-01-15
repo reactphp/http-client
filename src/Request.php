@@ -50,15 +50,10 @@ class Request implements WritableStreamInterface
     {
         $this->state = self::STATE_WRITING_HEAD;
 
-        $requestData = $this->requestData;
-        $streamRef = &$this->stream;
-        $stateRef = &$this->state;
-        $pendingWrites = &$this->pendingWrites;
-
         $promise = $this->connect();
         $promise->done(
-            function (ConnectionInterface $stream) use ($requestData, &$streamRef, &$stateRef, &$pendingWrites) {
-                $streamRef = $stream;
+            function (ConnectionInterface $stream) {
+                $this->stream = $stream;
 
                 $stream->on('drain', array($this, 'handleDrain'));
                 $stream->on('data', array($this, 'handleData'));
@@ -66,15 +61,15 @@ class Request implements WritableStreamInterface
                 $stream->on('error', array($this, 'handleError'));
                 $stream->on('close', array($this, 'handleClose'));
 
-                $headers = (string) $requestData;
+                $headers = (string) $this->requestData;
 
-                $more = $stream->write($headers . $pendingWrites);
+                $more = $stream->write($headers . $this->pendingWrites);
 
-                $stateRef = Request::STATE_HEAD_WRITTEN;
+                $this->state = Request::STATE_HEAD_WRITTEN;
 
                 // clear pending writes if non-empty
-                if ($pendingWrites !== '') {
-                    $pendingWrites = '';
+                if ($this->pendingWrites !== '') {
+                    $this->pendingWrites = '';
 
                     if ($more) {
                         $this->emit('drain');
@@ -274,11 +269,9 @@ class Request implements WritableStreamInterface
     public function getResponseFactory()
     {
         if (null === $factory = $this->responseFactory) {
-            $stream = $this->stream;
-
-            $factory = function ($protocol, $version, $code, $reasonPhrase, $headers) use ($stream) {
+            $factory = function ($protocol, $version, $code, $reasonPhrase, $headers) {
                 return new Response(
-                    $stream,
+                    $this->stream,
                     $protocol,
                     $version,
                     $code,
