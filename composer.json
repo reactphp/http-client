@@ -7,9 +7,9 @@
         "php": ">=5.4.0",
         "evenement/evenement": "^3.0 || ^2.0",
         "react/event-loop": "^1.0 || ^0.5 || ^0.4 || ^0.3",
+        "react/promise": "^2.1 || ^1.2.1",
         "react/socket": "^1.0 || ^0.8.4",
         "react/stream": "^1.0 || ^0.7.1",
-        "react/promise": "~2.2",
         "ringcentral/psr7": "^1.2"
     },
     "require-dev": {
