@@ -8,6 +8,7 @@ Event-driven, streaming HTTP client for [ReactPHP](https://reactphp.org).
 **Table of Contents**
 
 * [Basic usage](#basic-usage)
+  * [Client](#client)
   * [Example](#example)
 * [Advanced usage](#advanced-usage)
   * [Unix domain sockets](#unix-domain-sockets)
@@ -16,6 +17,36 @@ Event-driven, streaming HTTP client for [ReactPHP](https://reactphp.org).
 * [License](#license)
 
 ## Basic usage
+
+### Client
+
+The `Client` is responsible for communicating with HTTP servers, managing the
+connection state and sending your HTTP requests.
+It also registers everything with the main [`EventLoop`](https://github.com/reactphp/event-loop#usage).
+
+```php
+$loop = React\EventLoop\Factory::create();
+$client = new Client($loop);
+```
+
+If you need custom connector settings (DNS resolution, TLS parameters, timeouts,
+proxy servers etc.), you can explicitly pass a custom instance of the
+[`ConnectorInterface`](https://github.com/reactphp/socket#connectorinterface):
+
+```php
+$connector = new \React\Socket\Connector($loop, array(
+    'dns' => '127.0.0.1',
+    'tcp' => array(
+        'bindto' => '192.168.10.1:0'
+    ),
+    'tls' => array(
+        'verify_peer' => false,
+        'verify_peer_name' => false
+    )
+));
+
+$client = new Client($loop, $connector);
+```
 
 The `request(string $method, string $uri, array $headers = array(), string $version = '1.0'): Request`
 method can be used to prepare new Request objects.
