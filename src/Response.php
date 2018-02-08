@@ -31,17 +31,10 @@ class Response extends EventEmitter  implements ReadableStreamInterface
         $this->code = $code;
         $this->reasonPhrase = $reasonPhrase;
         $this->headers = $headers;
-        $normalizedHeaders = array_change_key_case($headers, CASE_LOWER);
 
-        if (isset($normalizedHeaders['transfer-encoding']) && strtolower($normalizedHeaders['transfer-encoding']) === 'chunked') {
+        if (strtolower($this->getHeaderLine('Transfer-Encoding')) === 'chunked') {
             $this->stream = new ChunkedStreamDecoder($stream);
-
-            foreach ($this->headers as $key => $value) {
-                if (strcasecmp('transfer-encoding', $key) === 0) {
-                    unset($this->headers[$key]);
-                    break;
-                }
-            }
+            $this->removeHeader('Transfer-Encoding');
         }
 
         $this->stream->on('data', array($this, 'handleData'));
@@ -73,6 +66,29 @@ class Response extends EventEmitter  implements ReadableStreamInterface
     public function getHeaders()
     {
         return $this->headers;
+    }
+
+    private function removeHeader($name)
+    {
+        foreach ($this->headers as $key => $value) {
+            if (strcasecmp($name, $key) === 0) {
+                unset($this->headers[$key]);
+                break;
+            }
+        }
+    }
+
+    private function getHeader($name)
+    {
+        $name = strtolower($name);
+        $normalized = array_change_key_case($this->headers, CASE_LOWER);
+
+        return isset($normalized[$name]) ? (array)$normalized[$name] : array();
+    }
+
+    private function getHeaderLine($name)
+    {
+        return implode(', ' , $this->getHeader($name));
     }
 
     /** @internal */

@@ -129,5 +129,36 @@ class ResponseTest extends TestCase
             $response->getHeaders()
         );
     }
+
+    /** @test */
+    public function doubleChunkedEncodingResponseWillBePassedAsIs()
+    {
+        $stream = new ThroughStream();
+        $response = new Response(
+            $stream,
+            'http',
+            '1.0',
+            '200',
+            'ok',
+            array(
+                'content-type' => 'text/plain',
+                'transfer-encoding' => array(
+                    'chunked',
+                    'chunked'
+                )
+            )
+        );
+
+        $this->assertSame(
+            array(
+                'content-type' => 'text/plain',
+                'transfer-encoding' => array(
+                    'chunked',
+                    'chunked'
+                )
+            ),
+            $response->getHeaders()
+        );
+    }
 }
 
