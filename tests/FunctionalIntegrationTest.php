@@ -15,6 +15,7 @@ class FunctionalIntegrationTest extends TestCase
         $loop = Factory::create();
 
         $server = new Server(0, $loop);
+        $server->on('connection', $this->expectCallableOnce());
         $server->on('connection', function (ConnectionInterface $conn) use ($server) {
             $conn->end("HTTP/1.1 200 OK\r\n\r\nOk");
             $server->close();

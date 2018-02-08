@@ -6,6 +6,7 @@ php:
   - 5.6
   - 7.0
   - 7.1
+  - 7.2
   - nightly # ignore errors, see below
   - hhvm # ignore errors, see below
 
@@ -17,8 +18,8 @@ matrix:
     - php: nightly
     - php: hhvm
 
-before_script:
-  - composer install
-  
+install:
+  - composer install --no-interaction
+
 script:
   - vendor/bin/phpunit --coverage-text
