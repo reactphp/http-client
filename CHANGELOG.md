@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.5.7 (2018-02-08)
+
+*   Fix: Ignore excessive whitespace in chunk header for `Transfer-Encoding: chunked`
+    (#123 by @DangerLifter and @clue)
+
+*   Fix: Ignore invalid incoming `Transfer-Encoding` response header
+    (#122 by @clue)
+
+*   Improve documentation for `Client` (and advanced `Connector`)
+    (#111 by @jsor and #121 by @clue)
+
+*   Improve test suite by adding support for PHPUnit 6
+    (#112 by @carusogabriel)
+
 ## 0.5.6 (2017-09-17)
 
 *   Feature: Update Socket component to support HTTP over Unix domain sockets (UDS)

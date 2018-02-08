@@ -1,7 +1,6 @@
 # HttpClient
 
 [![Build Status](https://travis-ci.org/reactphp/http-client.svg?branch=master)](https://travis-ci.org/reactphp/http-client)
-[![Code Climate](https://codeclimate.com/github/reactphp/http-client/badges/gpa.svg)](https://codeclimate.com/github/reactphp/http-client)
 
 Event-driven, streaming HTTP client for [ReactPHP](https://reactphp.org).
 
@@ -165,13 +164,13 @@ The recommended way to install this library is [through Composer](https://getcom
 This will install the latest supported version:
 
 ```bash
-$ composer require react/http-client:^0.5.6
+$ composer require react/http-client:^0.5.7
 ```
 
 See also the [CHANGELOG](CHANGELOG.md) for details about version upgrades.
 
 This project aims to run on any platform and thus does not require any PHP
-extensions and supports running on legacy PHP 5.3 through current PHP 7+ and
+extensions and supports running on legacy PHP 5.4 through current PHP 7+ and
 HHVM.
 It's *highly recommended to use PHP 7+* for this project.
 
