@@ -56,7 +56,7 @@ class Request implements WritableStreamInterface
         $pendingWrites = &$this->pendingWrites;
 
         $promise = $this->connect();
-        $promise->done(
+        $promise->then(
             function (ConnectionInterface $stream) use ($requestData, &$streamRef, &$stateRef, &$pendingWrites) {
                 $streamRef = $stream;
 
