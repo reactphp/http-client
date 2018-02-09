@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.5.8 (2018-02-09)
+
+*   Support legacy PHP 5.3 through PHP 7.2 and HHVM
+    (#126 and #127 by @clue)
+
+*   Improve backwards compatibility with Promise v1 and
+    use RingCentral to improve interoperability with react/http.
+    (#124 and #125 by @clue)
+
 ## 0.5.7 (2018-02-08)
 
 *   Fix: Ignore excessive whitespace in chunk header for `Transfer-Encoding: chunked`
