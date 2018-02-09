@@ -64,9 +64,9 @@ class ResponseTest extends TestCase
         $response->handleEnd();
 
         $this->assertSame(
-            [
+            array(
                 'Content-Type' => 'text/plain'
-            ],
+            ),
             $response->getHeaders()
         );
     }
@@ -89,9 +89,9 @@ class ResponseTest extends TestCase
         $response->pause();
 
         $this->assertSame(
-            [
+            array(
                 'content-type' => 'text/plain',
-            ],
+            ),
             $response->getHeaders()
         );
     }
@@ -106,10 +106,10 @@ class ResponseTest extends TestCase
             '1.0',
             '200',
             'ok',
-            [
+            array(
                 'content-type' => 'text/plain',
                 'transfer-encoding' => 'chunked',
-            ]
+            )
         );
 
         $buffer = '';
@@ -123,9 +123,9 @@ class ResponseTest extends TestCase
         $this->assertSame('Wiki', $buffer);
 
         $this->assertSame(
-            [
+            array(
                 'content-type' => 'text/plain',
-            ],
+            ),
             $response->getHeaders()
         );
     }

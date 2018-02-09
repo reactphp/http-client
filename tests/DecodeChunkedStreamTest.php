@@ -10,81 +10,81 @@ class DecodeChunkedStreamTest extends TestCase
 {
     public function provideChunkedEncoding()
     {
-        return [
-            'data-set-1' => [
-                ["4\r\nWiki\r\n5\r\npedia\r\ne\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"],
-            ],
-            'data-set-2' => [
-                ["4\r\nWiki\r\n", "5\r\npedia\r\ne\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"],
-            ],
-            'data-set-3' => [
-                ["4\r\nWiki\r\n", "5\r\n", "pedia\r\ne\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"],
-            ],
-            'data-set-4' => [
-                ["4\r\nWiki\r\n", "5\r\n", "pedia\r\ne\r\n in\r\n", "\r\nchunks.\r\n0\r\n\r\n"],
-            ],
-            'data-set-5' => [
-                ["4\r\n", "Wiki\r\n", "5\r\n", "pedia\r\ne\r\n in\r\n", "\r\nchunks.\r\n0\r\n\r\n"],
-            ],
-            'data-set-6' => [
-                ["4\r\n", "Wiki\r\n", "5\r\n", "pedia\r\ne; foo=[bar,beer,pool,cue,win,won]\r\n", " in\r\n", "\r\nchunks.\r\n0\r\n\r\n"],
-            ],
-            'header-fields' => [
-                ["4; foo=bar\r\n", "Wiki\r\n", "5\r\n", "pedia\r\ne\r\n", " in\r\n", "\r\nchunks.\r\n", "0\r\n\r\n"],
-            ],
-            'character-for-charactrr' => [
+        return array(
+            'data-set-1' => array(
+                array("4\r\nWiki\r\n5\r\npedia\r\ne\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"),
+            ),
+            'data-set-2' => array(
+                array("4\r\nWiki\r\n", "5\r\npedia\r\ne\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"),
+            ),
+            'data-set-3' => array(
+                array("4\r\nWiki\r\n", "5\r\n", "pedia\r\ne\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"),
+            ),
+            'data-set-4' => array(
+                array("4\r\nWiki\r\n", "5\r\n", "pedia\r\ne\r\n in\r\n", "\r\nchunks.\r\n0\r\n\r\n"),
+            ),
+            'data-set-5' => array(
+                array("4\r\n", "Wiki\r\n", "5\r\n", "pedia\r\ne\r\n in\r\n", "\r\nchunks.\r\n0\r\n\r\n"),
+            ),
+            'data-set-6' => array(
+                array("4\r\n", "Wiki\r\n", "5\r\n", "pedia\r\ne; foo=[bar,beer,pool,cue,win,won]\r\n", " in\r\n", "\r\nchunks.\r\n0\r\n\r\n"),
+            ),
+            'header-fields' => array(
+                array("4; foo=bar\r\n", "Wiki\r\n", "5\r\n", "pedia\r\ne\r\n", " in\r\n", "\r\nchunks.\r\n", "0\r\n\r\n"),
+            ),
+            'character-for-charactrr' => array(
                 str_split("4\r\nWiki\r\n5\r\npedia\r\ne\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"),
-            ],
-            'extra-newline-in-wiki-character-for-chatacter' => [
+            ),
+            'extra-newline-in-wiki-character-for-chatacter' => array(
                 str_split("6\r\nWi\r\nki\r\n5\r\npedia\r\ne\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"),
                 "Wi\r\nkipedia in\r\n\r\nchunks."
-            ],
-            'extra-newline-in-wiki' => [
-                ["6\r\nWi\r\n", "ki\r\n5\r\npedia\r\ne\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"],
+            ),
+            'extra-newline-in-wiki' => array(
+                array("6\r\nWi\r\n", "ki\r\n5\r\npedia\r\ne\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"),
                 "Wi\r\nkipedia in\r\n\r\nchunks."
-            ],
-            'varnish-type-response-1' => [
-                ["0017\r\nWikipedia in\r\n\r\nchunks.\r\n0\r\n\r\n"]
-            ],
-            'varnish-type-response-2' => [
-                ["000017\r\nWikipedia in\r\n\r\nchunks.\r\n0\r\n\r\n"]
-            ],
-            'varnish-type-response-3' => [
-                ["017\r\nWikipedia in\r\n\r\nchunks.\r\n0\r\n\r\n"]
-            ],
-            'varnish-type-response-4' => [
-                ["004\r\nWiki\r\n005\r\npedia\r\n00e\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"]
-            ],
-            'varnish-type-response-5' => [
-                ["000004\r\nWiki\r\n00005\r\npedia\r\n000e\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"]
-            ],
-            'varnish-type-response-extra-line' => [
-                ["006\r\nWi\r\nki\r\n005\r\npedia\r\n00e\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"],
+            ),
+            'varnish-type-response-1' => array(
+                array("0017\r\nWikipedia in\r\n\r\nchunks.\r\n0\r\n\r\n")
+            ),
+            'varnish-type-response-2' => array(
+                array("000017\r\nWikipedia in\r\n\r\nchunks.\r\n0\r\n\r\n")
+            ),
+            'varnish-type-response-3' => array(
+                array("017\r\nWikipedia in\r\n\r\nchunks.\r\n0\r\n\r\n")
+            ),
+            'varnish-type-response-4' => array(
+                array("004\r\nWiki\r\n005\r\npedia\r\n00e\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n")
+            ),
+            'varnish-type-response-5' => array(
+                array("000004\r\nWiki\r\n00005\r\npedia\r\n000e\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n")
+            ),
+            'varnish-type-response-extra-line' => array(
+                array("006\r\nWi\r\nki\r\n005\r\npedia\r\n00e\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"),
                 "Wi\r\nkipedia in\r\n\r\nchunks."
-            ],
-            'varnish-type-response-random' => [
-                [str_repeat("0", rand(0, 10)), "4\r\nWiki\r\n", str_repeat("0", rand(0, 10)), "5\r\npedia\r\n", str_repeat("0", rand(0, 10)), "e\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"]
-            ],
-            'end-chunk-zero-check-1' => [
-                ["4\r\nWiki\r\n5\r\npedia\r\ne\r\n in\r\n\r\nchunks.\r\n00\r\n\r\n"]
-            ],
-            'end-chunk-zero-check-2' => [
-                ["4\r\nWiki\r\n5\r\npedia\r\ne\r\n in\r\n\r\nchunks.\r\n000\r\n\r\n"]
-            ],
-            'end-chunk-zero-check-3' => [
-                ["00004\r\nWiki\r\n005\r\npedia\r\ne\r\n in\r\n\r\nchunks.\r\n0000\r\n\r\n"]
-            ],
-            'uppercase-chunk' => [
-                ["4\r\nWiki\r\n5\r\npedia\r\nE\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"],
-            ],
-            'extra-space-in-length-chunk' => [
-                [" 04 \r\nWiki\r\n5\r\npedia\r\nE\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"],
-            ],
-            'only-whitespace-is-final-chunk' => [
-                ["   \r\n\r\n"],
+            ),
+            'varnish-type-response-random' => array(
+                array(str_repeat("0", rand(0, 10)), "4\r\nWiki\r\n", str_repeat("0", rand(0, 10)), "5\r\npedia\r\n", str_repeat("0", rand(0, 10)), "e\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n")
+            ),
+            'end-chunk-zero-check-1' => array(
+                array("4\r\nWiki\r\n5\r\npedia\r\ne\r\n in\r\n\r\nchunks.\r\n00\r\n\r\n")
+            ),
+            'end-chunk-zero-check-2' => array(
+                array("4\r\nWiki\r\n5\r\npedia\r\ne\r\n in\r\n\r\nchunks.\r\n000\r\n\r\n")
+            ),
+            'end-chunk-zero-check-3' => array(
+                array("00004\r\nWiki\r\n005\r\npedia\r\ne\r\n in\r\n\r\nchunks.\r\n0000\r\n\r\n")
+            ),
+            'uppercase-chunk' => array(
+                array("4\r\nWiki\r\n5\r\npedia\r\nE\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"),
+            ),
+            'extra-space-in-length-chunk' => array(
+                array(" 04 \r\nWiki\r\n5\r\npedia\r\nE\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"),
+            ),
+            'only-whitespace-is-final-chunk' => array(
+                array("   \r\n\r\n"),
                 ""
-            ]
-        ];
+            )
+        );
     }
 
     /**
@@ -110,17 +110,17 @@ class DecodeChunkedStreamTest extends TestCase
 
     public function provideInvalidChunkedEncoding()
     {
-        return [
-            'chunk-body-longer-than-header-suggests' => [
-                ["4\r\nWiwot40n98w3498tw3049nyn039409t34\r\n", "ki\r\n5\r\npedia\r\ne\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"],
-            ],
-            'invalid-header-charactrrs' => [
+        return array(
+            'chunk-body-longer-than-header-suggests' => array(
+                array("4\r\nWiwot40n98w3498tw3049nyn039409t34\r\n", "ki\r\n5\r\npedia\r\ne\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n"),
+            ),
+            'invalid-header-charactrrs' => array(
                 str_split("xyz\r\nWi\r\nki\r\n5\r\npedia\r\ne\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n")
-            ],
-            'header-chunk-to-long' => [
+            ),
+            'header-chunk-to-long' => array(
                 str_split(str_repeat('a', 2015) . "\r\nWi\r\nki\r\n5\r\npedia\r\ne\r\n in\r\n\r\nchunks.\r\n0\r\n\r\n")
-            ]
-        ];
+            )
+        );
     }
 
     /**
@@ -142,10 +142,10 @@ class DecodeChunkedStreamTest extends TestCase
 
     public function provideZeroChunk()
     {
-        return [
-            ['1-zero' => "0\r\n\r\n"],
-            ['random-zero' => str_repeat("0", rand(2, 10))."\r\n\r\n"]
-        ];
+        return array(
+            array('1-zero' => "0\r\n\r\n"),
+            array('random-zero' => str_repeat("0", rand(2, 10))."\r\n\r\n")
+        );
     }
 
     /**

@@ -2,7 +2,7 @@
 
 namespace React\HttpClient;
 
-use Evenement\EventEmitterTrait;
+use Evenement\EventEmitter;
 use React\Promise;
 use React\Socket\ConnectionInterface;
 use React\Socket\ConnectorInterface;
@@ -15,10 +15,8 @@ use RingCentral\Psr7 as gPsr;
  * @event error
  * @event end
  */
-class Request implements WritableStreamInterface
+class Request extends EventEmitter implements WritableStreamInterface
 {
-    use EventEmitterTrait;
-
     const STATE_INIT = 0;
     const STATE_WRITING_HEAD = 1;
     const STATE_HEAD_WRITTEN = 2;
@@ -54,17 +52,18 @@ class Request implements WritableStreamInterface
         $streamRef = &$this->stream;
         $stateRef = &$this->state;
         $pendingWrites = &$this->pendingWrites;
+        $that = $this;
 
         $promise = $this->connect();
         $promise->then(
-            function (ConnectionInterface $stream) use ($requestData, &$streamRef, &$stateRef, &$pendingWrites) {
+            function (ConnectionInterface $stream) use ($requestData, &$streamRef, &$stateRef, &$pendingWrites, $that) {
                 $streamRef = $stream;
 
-                $stream->on('drain', array($this, 'handleDrain'));
-                $stream->on('data', array($this, 'handleData'));
-                $stream->on('end', array($this, 'handleEnd'));
-                $stream->on('error', array($this, 'handleError'));
-                $stream->on('close', array($this, 'handleClose'));
+                $stream->on('drain', array($that, 'handleDrain'));
+                $stream->on('data', array($that, 'handleData'));
+                $stream->on('end', array($that, 'handleEnd'));
+                $stream->on('error', array($that, 'handleError'));
+                $stream->on('close', array($that, 'handleClose'));
 
                 $headers = (string) $requestData;
 
@@ -77,7 +76,7 @@ class Request implements WritableStreamInterface
                     $pendingWrites = '';
 
                     if ($more) {
-                        $this->emit('drain');
+                        $that->emit('drain');
                     }
                 }
             },
@@ -154,11 +153,10 @@ class Request implements WritableStreamInterface
                 return;
             }
 
-            $response->on('close', function () {
-                $this->close();
-            });
-            $response->on('error', function (\Exception $error) {
-                $this->closeError(new \RuntimeException(
+            $response->on('close', array($this, 'close'));
+            $that = $this;
+            $response->on('error', function (\Exception $error) use ($that) {
+                $that->closeError(new \RuntimeException(
                     "An error occured in the response",
                     0,
                     $error

@@ -126,7 +126,7 @@ class RequestDataTest extends TestCase
     /** @test */
     public function toStringReturnsHTTPRequestMessageWithProtocolVersionThroughConstructor()
     {
-        $requestData = new RequestData('GET', 'http://www.example.com', [], '1.1');
+        $requestData = new RequestData('GET', 'http://www.example.com', array(), '1.1');
 
         $expected = "GET / HTTP/1.1\r\n" .
             "Host: www.example.com\r\n" .
