@@ -29,6 +29,29 @@ class FunctionalIntegrationTest extends TestCase
         $loop->run();
     }
 
+    public function testRequestLegacyHttpServerWithOnlyLineFeedReturnsSuccessfulResponse()
+    {
+        $loop = Factory::create();
+
+        $server = new Server(0, $loop);
+        $server->on('connection', function (ConnectionInterface $conn) use ($server) {
+            $conn->end("HTTP/1.0 200 OK\n\nbody");
+            $server->close();
+        });
+
+        $client = new Client($loop);
+        $request = $client->request('GET', str_replace('tcp:', 'http:', $server->getAddress()));
+
+        $once = $this->expectCallableOnceWith('body');
+        $request->on('response', function (Response $response) use ($once) {
+            $response->on('data', $once);
+        });
+
+        $request->end();
+
+        $loop->run();
+    }
+
     /** @group internet */
     public function testSuccessfulResponseEmitsEnd()
     {

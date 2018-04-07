@@ -134,7 +134,8 @@ class Request extends EventEmitter implements WritableStreamInterface
     {
         $this->buffer .= $data;
 
-        if (false !== strpos($this->buffer, "\r\n\r\n")) {
+        // buffer until double CRLF (or double LF for compatibility with legacy servers)
+        if (false !== strpos($this->buffer, "\r\n\r\n") || false !== strpos($this->buffer, "\n\n")) {
             try {
                 list($response, $bodyChunk) = $this->parseResponse($this->buffer);
             } catch (\InvalidArgumentException $exception) {
