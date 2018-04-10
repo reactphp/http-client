@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5.9 (2018-04-10)
+
+*   Feature: Support legacy HTTP servers that use only `LF` instead of `CRLF`.
+    (#130 by @clue)
+
+*   Improve test suite by applying maximum test timeouts for integration tests.
+    (#131 by @clue)
+
 ## 0.5.8 (2018-02-09)
 
 *   Support legacy PHP 5.3 through PHP 7.2 and HHVM
