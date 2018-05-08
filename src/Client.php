@@ -13,16 +13,41 @@ class Client
     public function __construct(LoopInterface $loop, ConnectorInterface $connector = null)
     {
         if ($connector === null) {
-            $connector = new Connector($loop);
+            $connector = new KeepaliveConnector(new Connector($loop));
         }
 
-        $this->connector = $connector;
+        $this->connector = new KeepaliveConnector($connector);
     }
 
     public function request($method, $url, array $headers = array(), $protocolVersion = '1.0')
     {
         $requestData = new RequestData($method, $url, $headers, $protocolVersion);
 
-        return new Request($this->connector, $requestData);
+        $that = $this;
+        $request = new Request($this->connector, $requestData);
+        $request->on('close', function() use ($that, $url) {
+            $that->connector->handleConnectionClose($url);
+        });
+        $request->on('response',
+            function(Response $response) use ($url, $headers, $that) {
+                if ($that->isConnectionClose($headers)
+                    || $that->isConnectionClose($response->getHeaders())) {
+                    $that->connector->handleConnectionClose($url);
+                }
+            }
+        );
+
+        return $request;
+    }
+
+    private function isConnectionClose($headers)
+    {
+        $normalizedHeaders = array_change_key_case($headers, CASE_LOWER);
+
+        if (!isset($normalizedHeaders['connection'])) {
+            return false;
+        }
+
+        return strtolower($normalizedHeaders['connection'] === 'close');
     }
 }
