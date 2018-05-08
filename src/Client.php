@@ -48,6 +48,6 @@ class Client
             return false;
         }
 
-        return strtolower($normalizedHeaders['connection'] === 'close');
+        return strtolower($normalizedHeaders['connection']) === 'close';
     }
 }
