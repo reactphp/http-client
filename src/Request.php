@@ -133,7 +133,7 @@ class Request extends EventEmitter implements WritableStreamInterface
     public function handleData($data)
     {
         // buffer until double CRLF (or double LF for compatibility with legacy servers)
-        if (false !== strpos($data, "\r\n\r\n") || false !== strpos($data, "\n\n"))
+        if (false !== strpos($data, "\r\n\r\n") || false !== strpos($data, "\n\n")) {
             $this->buffer .= $data;
 
             try {
