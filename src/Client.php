@@ -40,7 +40,8 @@ class Client
         return $request;
     }
 
-    private function isConnectionClose($headers)
+    /** @internal */
+    public function isConnectionClose($headers)
     {
         $normalizedHeaders = array_change_key_case($headers, CASE_LOWER);
 
