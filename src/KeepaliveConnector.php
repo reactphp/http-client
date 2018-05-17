@@ -3,6 +3,7 @@
 namespace React\HttpClient;
 
 use React\Promise\PromiseInterface;
+use React\Promise;
 use React\Socket\ConnectionInterface;
 use React\Socket\ConnectorInterface;
 
@@ -35,13 +36,17 @@ class KeepaliveConnector implements ConnectorInterface
 
     private function tryReuseAliveConnection($uri)
     {
-        return $this->aliveConnections[$uri];
+        return Promise\resolve($this->aliveConnections[$uri]);
     }
 
     private function createNewConnection($uri)
     {
         $connection = $this->directConnector->connect($uri);
-        $this->aliveConnections[$uri] = $connection;
-        return $connection;
+
+        $that = $this;
+        return $connection->then(function(ConnectionInterface $connection) use ($that, $uri) {
+            $that->aliveConnections[$uri] = $connection;
+            return $connection;
+        });
     }
 }
