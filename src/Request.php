@@ -248,7 +248,8 @@ class Request extends EventEmitter implements WritableStreamInterface
     protected function connect()
     {
         $scheme = $this->requestData->getScheme();
-        if ($scheme !== 'https' && $scheme !== 'http') {
+        // protocl name => ignore case
+        if (strcasecmp($scheme, 'https') !== 0 && strcasecmp($scheme, 'http') !== 0) {
             return Promise\reject(
                 new \InvalidArgumentException('Invalid request URL given')
             );
