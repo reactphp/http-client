@@ -258,7 +258,7 @@ class Request extends EventEmitter implements WritableStreamInterface
         $host = $this->requestData->getHost();
         $port = $this->requestData->getPort();
 
-        if ($scheme === 'https') {
+        if (strcasecmp($scheme, 'https')) {
             $host = 'tls://' . $host;
         }
 
