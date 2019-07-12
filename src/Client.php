@@ -8,6 +8,7 @@ use React\Socket\Connector;
 
 class Client
 {
+    private $loop;
     private $connector;
 
     public function __construct(LoopInterface $loop, ConnectorInterface $connector = null)
@@ -16,6 +17,7 @@ class Client
             $connector = new Connector($loop);
         }
 
+        $this->loop = $loop;
         $this->connector = $connector;
     }
 
@@ -23,6 +25,9 @@ class Client
     {
         $requestData = new RequestData($method, $url, $headers, $protocolVersion);
 
-        return new Request($this->connector, $requestData);
+        $request = new Request($this->connector, $requestData);
+        $request->setLoop($this->loop);
+
+        return $request;
     }
 }

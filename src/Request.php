@@ -3,6 +3,7 @@
 namespace React\HttpClient;
 
 use Evenement\EventEmitter;
+use React\EventLoop\LoopInterface;
 use React\Promise;
 use React\Socket\ConnectionInterface;
 use React\Socket\ConnectorInterface;
@@ -22,6 +23,7 @@ class Request extends EventEmitter implements WritableStreamInterface
     const STATE_HEAD_WRITTEN = 2;
     const STATE_END = 3;
 
+    private $loop;
     private $connector;
     private $requestData;
 
@@ -32,12 +34,32 @@ class Request extends EventEmitter implements WritableStreamInterface
     private $ended = false;
 
     private $pendingWrites = '';
+    private $timeout = 0.0;
+    private $timeoutTimer;
 
     public function __construct(ConnectorInterface $connector, RequestData $requestData)
     {
         $this->connector = $connector;
         $this->requestData = $requestData;
     }
+
+    // non-BC way to add the loop to the request
+
+    /** @internal */
+    public function setLoop(LoopInterface $loop)
+    {
+        $this->loop = $loop;
+    }
+
+    // non-BC way to add a timeout
+
+    public function setTimeout($timeout)
+    {
+        $this->timeout = $timeout;
+    }
+
+    // we may want to merge these two methods into the constructor
+    // in the next major version
 
     public function isWritable()
     {
@@ -47,12 +69,18 @@ class Request extends EventEmitter implements WritableStreamInterface
     private function writeHead()
     {
         $this->state = self::STATE_WRITING_HEAD;
+        $that = $this;
+
+        if ($this->timeout > 0.0) {
+            $this->timeoutTimer = $this->loop->addTimer($this->timeout, function () use ($that) {
+                $that->closeError(new TimeoutException('The request took longer than expected ('.$that->timeout.' seconds)'));
+            });
+        }
 
         $requestData = $this->requestData;
         $streamRef = &$this->stream;
         $stateRef = &$this->state;
         $pendingWrites = &$this->pendingWrites;
-        $that = $this;
 
         $promise = $this->connect();
         $promise->then(
@@ -208,6 +236,11 @@ class Request extends EventEmitter implements WritableStreamInterface
     {
         if (self::STATE_END <= $this->state) {
             return;
+        }
+
+        if ($this->timeoutTimer !== null) {
+            $this->loop->cancelTimer($this->timeoutTimer);
+            $this->timeoutTimer = null;
         }
 
         $this->state = self::STATE_END;

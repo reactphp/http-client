@@ -2,8 +2,11 @@
 
 namespace React\Tests\HttpClient;
 
+use Clue\React\Block;
+use React\EventLoop\Factory;
 use React\HttpClient\Request;
 use React\HttpClient\RequestData;
+use React\HttpClient\TimeoutException;
 use React\Stream\Stream;
 use React\Stream\DuplexResourceStream;
 use React\Promise\RejectedPromise;
@@ -707,5 +710,86 @@ class RequestTest extends TestCase
         $request->handleData("\r\n1\r\nb\r");
         $request->handleData("\n3\t\nody\r\n0\t\n\r\n");
 
+    }
+
+    /** @test */
+    public function timeoutRequest()
+    {
+        $requestData = new RequestData('GET', 'http://www.example.com');
+        $request = new Request($this->connector, $requestData);
+
+        $loop = Factory::create();
+        $request->setLoop($loop);
+        $request->setTimeout(2.0);
+
+        $deferred = new Deferred();
+
+        $request->on('end', function () use ($deferred) {
+            $deferred->resolve();
+        });
+
+        $request->on('error', function ($e) use ($deferred) {
+            $deferred->reject($e);
+        });
+
+        $this->successfulConnectionMock();
+
+        $request->end();
+
+        $this->stream->expects($this->once())
+            ->method('emit')
+            ->with('data', array("1\r\nb\r"));
+
+        $loop->addTimer(1.0, function () use ($request) {
+            $request->handleData("HTTP/1.0 200 OK\r\n");
+            $request->handleData("Transfer-Encoding: chunked\r\n");
+            $request->handleData("\r\n1\r\nb\r");
+            $request->handleData("\n3\t\nody\r\n0\t\n\r\n");
+            $request->emit('end');
+            $request->emit('close');
+        });
+
+        Block\await($deferred->promise(), $loop, 5.0);
+    }
+
+    /**
+     * @test
+     * @expectedException \React\HttpClient\TimeoutException
+     */
+    public function timeoutRequestMissingEndTimingOut()
+    {
+        $requestData = new RequestData('GET', 'http://www.example.com');
+        $request = new Request($this->connector, $requestData);
+
+        $loop = Factory::create();
+        $request->setLoop($loop);
+        $request->setTimeout(2.0);
+
+        $deferred = new Deferred();
+
+        $request->on('end', function () use ($deferred) {
+            $deferred->resolve();
+        });
+
+        $request->on('error', function ($e) use ($deferred) {
+            $deferred->reject($e);
+        });
+
+        $this->successfulConnectionMock();
+
+        $request->end();
+
+        $this->stream->expects($this->once())
+            ->method('emit')
+            ->with('data', array("1\r\nb\r"));
+
+        $loop->addTimer(1.0, function () use ($request) {
+            $request->handleData("HTTP/1.0 200 OK\r\n");
+            $request->handleData("Transfer-Encoding: chunked\r\n");
+            $request->handleData("\r\n1\r\nb\r");
+            $request->handleData("\n3\t\nody\r\n0\t\n\r\n");
+        });
+
+        Block\await($deferred->promise(), $loop, 5.0);
     }
 }

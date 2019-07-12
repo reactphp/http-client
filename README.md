@@ -15,6 +15,7 @@ Event-driven, streaming HTTP client for [ReactPHP](https://reactphp.org).
 
 * [Basic usage](#basic-usage)
   * [Client](#client)
+  * [Request Timeouts](#request-timeouts)
   * [Example](#example)
 * [Advanced usage](#advanced-usage)
   * [Unix domain sockets](#unix-domain-sockets)
@@ -112,6 +113,19 @@ Interesting events emitted by Response:
   preceeded by an `error` event.
   This will also be forwarded to the request and emit a `close` event there.
 
+### Request Timeouts
+
+Each request can have their own separate maximum timeout
+(connection timeout is implemented in the [`react/socket`](https://github.com/reactphp/socket) component).
+The maximum timeout is measured from the start of the request until the end of the response (completely received).
+
+The maximum time for a request to take can be set for each `Request` using their `setTimeout` method.
+The method takes a single argument indicating the timeout in seconds (as integer or float).
+
+The timeout has to be set before the request starts.
+Once the timeout is reached, a `React\HttpClient\TimeoutException` will be emitted as `error` event.
+The stream will be forcefully closed.
+
 ### Example
 
 ```php
@@ -129,9 +143,13 @@ $request->on('response', function ($response) {
         echo 'DONE';
     });
 });
-$request->on('error', function (\Exception $e) {
+$request->on('error', function (Exception $e) {
     echo $e;
 });
+
+// allow the request to take 30 seconds
+$request->setTimeout(30.0); 
+
 $request->end();
 $loop->run();
 ```
