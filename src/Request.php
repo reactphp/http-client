@@ -70,10 +70,11 @@ class Request extends EventEmitter implements WritableStreamInterface
     {
         $this->state = self::STATE_WRITING_HEAD;
         $that = $this;
+        $timeout = $this->timeout;
 
-        if ($this->timeout > 0.0) {
-            $this->timeoutTimer = $this->loop->addTimer($this->timeout, function () use ($that) {
-                $that->closeError(new TimeoutException('The request took longer than expected ('.$that->timeout.' seconds)'));
+        if ($timeout > 0.0) {
+            $this->timeoutTimer = $this->loop->addTimer($this->timeout, function () use ($that, $timeout) {
+                $that->closeError(new TimeoutException('The request took longer than expected ('.$timeout.' seconds)'));
             });
         }
 
