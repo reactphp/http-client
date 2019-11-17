@@ -1,8 +1,8 @@
 <?php
 
-namespace React\Tests\HttpClient;
+namespace React\Tests\HttpClient\Internal;
 
-use React\HttpClient\RequestData;
+use React\HttpClient\Internal\RequestData;
 
 class RequestDataTest extends TestCase
 {

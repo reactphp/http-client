@@ -1,9 +1,9 @@
 <?php
 
-namespace React\Tests\HttpClient;
+namespace React\Tests\HttpClient\Internal;
 
-use React\HttpClient\Request;
-use React\HttpClient\RequestData;
+use React\HttpClient\Internal\Request;
+use React\HttpClient\Internal\RequestData;
 use React\Stream\Stream;
 use React\Stream\DuplexResourceStream;
 use React\Promise\RejectedPromise;

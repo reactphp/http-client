@@ -1,9 +1,9 @@
 <?php
 
-namespace React\Tests\HttpClient;
+namespace React\Tests\HttpClient\Internal;
 
 use Exception;
-use React\HttpClient\ChunkedStreamDecoder;
+use React\HttpClient\Internal\ChunkedStreamDecoder;
 use React\Stream\ThroughStream;
 
 class DecodeChunkedStreamTest extends TestCase

@@ -1,6 +1,6 @@
 <?php
 
-namespace React\HttpClient;
+namespace React\HttpClient\Internal;
 
 use React\EventLoop\LoopInterface;
 use React\Socket\ConnectorInterface;

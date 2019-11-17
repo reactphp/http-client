@@ -1,6 +1,6 @@
 <?php
 
-namespace React\Tests\HttpClient;
+namespace React\Tests\HttpClient\Internal;
 
 use PHPUnit\Framework\TestCase as BaseTestCase;
 
@@ -50,7 +50,7 @@ class TestCase extends BaseTestCase
     protected function createCallableMock()
     {
         return $this
-            ->getMockBuilder('React\Tests\HttpClient\CallableStub')
+            ->getMockBuilder('React\Tests\HttpClient\Internal\CallableStub')
             ->getMock();
     }
 }

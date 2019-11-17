@@ -1,7 +1,7 @@
 <?php
 
-use React\HttpClient\Client;
-use React\HttpClient\Response;
+use React\HttpClient\Internal\Client;
+use React\HttpClient\Internal\Response;
 
 require __DIR__ . '/../vendor/autoload.php';
 

@@ -1,8 +1,8 @@
 <?php
 
-namespace React\Tests\HttpClient;
+namespace React\Tests\HttpClient\Internal;
 
-use React\HttpClient\Response;
+use React\HttpClient\Internal\Response;
 use React\Stream\ThroughStream;
 
 class ResponseTest extends TestCase

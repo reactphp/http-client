@@ -1,11 +1,11 @@
 <?php
 
-namespace React\Tests\HttpClient;
+namespace React\Tests\HttpClient\Internal;
 
 use Clue\React\Block;
 use React\EventLoop\Factory;
-use React\HttpClient\Client;
-use React\HttpClient\Response;
+use React\HttpClient\Internal\Client;
+use React\HttpClient\Internal\Response;
 use React\Promise\Deferred;
 use React\Promise\Stream;
 use React\Socket\Server;

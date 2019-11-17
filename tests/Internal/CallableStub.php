@@ -1,6 +1,6 @@
 <?php
 
-namespace React\Tests\HttpClient;
+namespace React\Tests\HttpClient\Internal;
 
 class CallableStub
 {
