@@ -111,7 +111,7 @@ class ChunkedStreamDecoder extends EventEmitter implements ReadableStreamInterfa
                 }
             }
             $this->nextChunkIsLength = false;
-            if (dechex(hexdec($lengthChunk)) !== strtolower($lengthChunk)) {
+            if (dechex(@hexdec($lengthChunk)) !== strtolower($lengthChunk)) {
                 $this->emit('error', array(
                     new Exception('Unable to validate "' . $lengthChunk . '" as chunk length header'),
                 ));
