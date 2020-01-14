@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.5.10 (2020-01-14)
+
+*   Fix: Avoid unneeded warning when decoding invalid data on PHP 7.4.
+    (#150 by @clue)
+
+*   Add `.gitattributes` to exclude dev files from exports.
+    (#149 by @reedy)
+
+*   Link to clue/reactphp-buzz for higher-level HTTP client.
+    (#139 by @clue)
+
+*   Improve test suite by simplifying test matrix and test setup.
+    (#151 by @clue)
+
 ## 0.5.9 (2018-04-10)
 
 *   Feature: Support legacy HTTP servers that use only `LF` instead of `CRLF`.
