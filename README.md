@@ -1,15 +1,47 @@
-# HttpClient
+# Deprecation notice
+
+This package has now been migrated over to
+[react/http](https://github.com/reactphp/http)
+and only exists for BC reasons.
+
+```bash
+$ composer require react/http
+```
+
+If you've previously used this package, upgrading may take a moment or two.
+The new API has been updated to use Promises and PSR-7 message abstractions.
+This means it's now more powerful and easier to use than ever:
+
+```php
+// old
+$client = new React\HttpClient\Client($loop);
+$request = $client->request('GET', 'https://example.com/');
+$request->on('response', function ($response) {
+    $response->on('data', function ($chunk) {
+        echo $chunk;
+    });
+});
+$request->end();
+
+// new
+$browser = new React\Http\Browser($loop);
+$browser->get('https://example.com/')->then(function (Psr\Http\Message\ResponseInterface $response) {
+    echo $response->getBody();
+});
+```
+
+See [react/http](https://github.com/reactphp/http#client-usage) for more details.
+
+The below documentation applies to the last release of this package.
+Further development will take place in the updated
+[react/http](https://github.com/reactphp/http),
+so you're highly recommended to upgrade as soon as possible.
+
+# Deprecated HttpClient
 
 [![Build Status](https://travis-ci.org/reactphp/http-client.svg?branch=master)](https://travis-ci.org/reactphp/http-client)
 
 Event-driven, streaming HTTP client for [ReactPHP](https://reactphp.org).
-
-> Note that this is a very low-level HTTP client implementation that is currently
-  undergoing some major changes. In the meantime, we recommend using
-  [clue/reactphp-buzz](https://github.com/clue/reactphp-buzz) as a higher-level
-  HTTP client abstraction (which happens to build on top of this project). It
-  provides a Promise-based interface and common PSR-7 message abstraction which
-  makes getting started much easier.
 
 **Table of Contents**
 
