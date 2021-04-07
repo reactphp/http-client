@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5.11 (2021-04-07)
+
+*   Fix: Minimal fix for PHP 8
+    (#154 by @remicollet)
+
+*   Documentation: Add deprecation notice to suggest HTTP component instead
+    (#153 by @clue)
+
 ## 0.5.10 (2020-01-14)
 
 *   Fix: Avoid unneeded warning when decoding invalid data on PHP 7.4.
