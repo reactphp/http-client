@@ -5,7 +5,7 @@ This package has now been migrated over to
 and only exists for BC reasons.
 
 ```bash
-$ composer require react/http
+composer require react/http
 ```
 
 If you've previously used this package, upgrading may take a moment or two.
@@ -203,7 +203,7 @@ The recommended way to install this library is [through Composer](https://getcom
 This will install the latest supported version:
 
 ```bash
-$ composer require react/http-client:^0.5.10
+composer require react/http-client:^0.5.10
 ```
 
 See also the [CHANGELOG](CHANGELOG.md) for details about version upgrades.
@@ -219,13 +219,13 @@ To run the test suite, you first need to clone this repo and then install all
 dependencies [through Composer](https://getcomposer.org):
 
 ```bash
-$ composer install
+composer install
 ```
 
 To run the test suite, go to the project root and run:
 
 ```bash
-$ php vendor/bin/phpunit
+php vendor/bin/phpunit
 ```
 
 The test suite also contains a number of functional integration tests that send
@@ -234,7 +234,7 @@ on a stable internet connection.
 If you do not want to run these, they can simply be skipped like this:
 
 ```bash
-$ php vendor/bin/phpunit --exclude-group internet
+php vendor/bin/phpunit --exclude-group internet
 ```
 
 ## License
